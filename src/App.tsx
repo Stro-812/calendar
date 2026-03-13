@@ -21,18 +21,11 @@ import { CalendarEvent, CalendarView } from "./types";
 const DAY_MINUTES = 24 * 60;
 const SLOT_HEIGHT = 56;
 
-const QUICK_FILTERS = [
-  { label: "Все", count: 18, tone: "all" },
-  { label: "Встречи", count: 8, tone: "meeting" },
-  { label: "Фокус", count: 5, tone: "focus" },
-  { label: "Личное", count: 5, tone: "personal" }
-] as const;
-
 const TEAM_CALENDARS = [
-  { label: "Product", color: "#1a73e8" },
-  { label: "Design", color: "#7986cb" },
-  { label: "Launch", color: "#d50000" },
-  { label: "Personal", color: "#8e24aa" }
+  { label: "Бег", color: "#0b4fb3" },
+  { label: "Плавание", color: "#33a0ff" },
+  { label: "Велосипед", color: "#5fa700" },
+  { label: "Прочее", color: "#7986cb" }
 ];
 
 type DraftEvent = {
@@ -85,6 +78,19 @@ export default function App() {
       startDate: parseDateTime(event.start),
       endDate: parseDateTime(event.end)
     }));
+  }, [events]);
+  const summary = useMemo(() => {
+    const all = events.length;
+    const focus = events.filter((event) => event.tag === "focus").length;
+    const personal = events.filter((event) => event.tag === "personal").length;
+    const meeting = events.filter((event) => event.tag === "meeting").length;
+
+    return {
+      all,
+      focus,
+      personal,
+      meeting
+    };
   }, [events]);
 
   const today = new Date("2026-03-11T00:00:00");
@@ -213,7 +219,12 @@ export default function App() {
               <button>Настроить</button>
             </div>
             <div className="filter-list">
-              {QUICK_FILTERS.map((filter) => (
+              {[
+                { label: "Все", count: summary.all, tone: "all" },
+                { label: "Бег / работа", count: summary.focus, tone: "focus" },
+                { label: "Вело / доп.", count: summary.meeting, tone: "meeting" },
+                { label: "Плавание", count: summary.personal, tone: "personal" }
+              ].map((filter) => (
                 <div className={`filter-chip filter-chip-${filter.tone}`} key={filter.label}>
                   <span>{filter.label}</span>
                   <strong>{filter.count}</strong>
@@ -302,8 +313,11 @@ export default function App() {
           <section className="hero-strip">
             <div className="hero-text">
               <div className="section-bar hero-bar">Сводка</div>
-              <strong>На этой неделе 18 событий</strong>
-              <p>5 ключевых встреч, 2 окна для deep work, 3 дедлайна требуют внимания</p>
+              <strong>В плане {summary.all} тренировок</strong>
+              <p>
+                {summary.focus} беговых сессий, {summary.personal} плавательных, {summary.meeting} вело или
+                дополнительных тренировок
+              </p>
             </div>
             <div className="hero-actions">
               <button>Поделиться</button>
