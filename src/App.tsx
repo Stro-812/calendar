@@ -15,12 +15,14 @@ import {
   parseDateTime,
   toLocalInputValue
 } from "./date";
+import { getActivityDetails } from "./api/activityApi";
 import { createEvent, listEvents, updateEvent } from "./api/calendarApi";
-import { CalendarEvent, CalendarView, TrainingPhase, TrainingSport } from "./types";
+import { ActivityDetails, CalendarEvent, CalendarView, TrainingPhase, TrainingSport } from "./types";
 
 const DAY_MINUTES = 24 * 60;
 const SLOT_HEIGHT = 56;
 const STUDENT_ID = "7439904";
+const DEMO_ACTIVITY_ID = "g22089384971";
 
 const PHASE_STYLES: Record<TrainingPhase, { dayBackground: string; label: string }> = {
   base: { dayBackground: "#eef9ee", label: "База" },
@@ -95,6 +97,7 @@ export default function App() {
   const [isComposerOpen, setIsComposerOpen] = useState(false);
   const [composerState, setComposerState] = useState<ComposerState>({ mode: "create", eventId: null });
   const [draggedEventId, setDraggedEventId] = useState<string | null>(null);
+  const [activityDetails, setActivityDetails] = useState<ActivityDetails | null>(null);
 
   useEffect(() => {
     listEvents().then(setEvents);
@@ -131,6 +134,28 @@ export default function App() {
   }, [visibleEvents]);
 
   const today = new Date("2026-03-11T00:00:00");
+
+  useEffect(() => {
+    const activityId = selectedEvent?.activityId ?? DEMO_ACTIVITY_ID;
+    let cancelled = false;
+
+    getActivityDetails(activityId)
+      .then((details) => {
+        if (!cancelled) {
+          setActivityDetails(details);
+        }
+      })
+      .catch((error) => {
+        if (!cancelled) {
+          console.error("Failed to load activity details", error);
+          setActivityDetails(null);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedEventId, selectedEvent?.activityId]);
 
   function shiftPeriod(direction: -1 | 1) {
     setCursorDate((current) => (view === "week" ? addDays(current, direction * 7) : addMonths(current, direction)));
@@ -423,30 +448,163 @@ export default function App() {
           )}
 
           <aside className="details-panel">
-            <div className="surface-title">Детали</div>
-            {selectedEvent ? (
+            {activityDetails ? (
               <>
-                <div className="details-chip" style={{ background: `${selectedEvent.color}20`, color: selectedEvent.color }}>
-                  {selectedEvent.tag}
+                <div className="activity-hero">
+                  <div className="activity-metric">
+                    <span className="activity-icon">🏃</span>
+                    <strong>{activityDetails.distance} км</strong>
+                  </div>
+                  <div className="activity-metric">
+                    <span className="activity-icon">⏱</span>
+                    <strong>{activityDetails.pace} мин/км</strong>
+                  </div>
+                  <div className="activity-metric">
+                    <span className="activity-icon">♡</span>
+                    <strong>{activityDetails.bpm} bpm</strong>
+                  </div>
+                  <div className="activity-metric">
+                    <span className="activity-icon">♬</span>
+                    <strong>{activityDetails.cadence}</strong>
+                  </div>
                 </div>
-                <h2>{selectedEvent.title}</h2>
-                {selectedEvent.phase ? <p>Фаза: {PHASE_STYLES[selectedEvent.phase].label}</p> : null}
-                {selectedEvent.trainingType ? <p>Тип: {selectedEvent.trainingType}</p> : null}
-                {selectedEvent.sport ? <p>Спорт: {SPORT_ICONS[selectedEvent.sport]} {SPORT_LABELS[selectedEvent.sport]}</p> : null}
-                <p>
-                  {formatTime(parseDateTime(selectedEvent.start))} - {formatTime(parseDateTime(selectedEvent.end))}
-                </p>
-                {selectedEvent.task ? <p>{selectedEvent.task}</p> : null}
-                {formatIntervalLine(selectedEvent) ? <p>{formatIntervalLine(selectedEvent)}</p> : null}
-                {selectedEvent.report ? <p>{selectedEvent.report}</p> : null}
-                <div className="details-actions">
-                  <button onClick={() => openEditor(selectedEvent.id)}>Редактировать</button>
+
+                <div className="activity-pulse-row">
+                  <div className="activity-pulse-box">
+                    <span className="activity-icon">👟</span>
+                    <div>
+                      <div className="activity-mini-label">импульс</div>
+                      <strong>{activityDetails.impulse}</strong>
+                    </div>
+                  </div>
+                  <div className="activity-pulse-box">
+                    <span className="activity-icon">☺</span>
+                    <div>
+                      <div className="activity-mini-label">gs</div>
+                      <strong>{activityDetails.gs}</strong>
+                    </div>
+                  </div>
+                </div>
+
+                {activityDetails.trainerComment ? (
+                  <div className="activity-note">
+                    <div className="activity-note-author">{activityDetails.trainerName || "Тренер"}</div>
+                    <div>{activityDetails.trainerComment}</div>
+                  </div>
+                ) : null}
+
+                {selectedEvent?.report ? (
+                  <div className="activity-note">
+                    <div className="activity-note-author">
+                      {activityDetails.trainerName || "Тренер"} <span className="activity-note-role">| Тренер</span>
+                    </div>
+                    <div>{selectedEvent.report}</div>
+                  </div>
+                ) : null}
+
+                <div className="activity-tabs">
+                  <span className="is-active">ФАКТ</span>
+                  <span>ЗАДАНИЕ</span>
+                </div>
+
+                <div className="activity-fact-grid">
+                  <div className="activity-column">
+                    <h3>Быстро</h3>
+                    <div className="activity-stat">
+                      <span>⏱</span>
+                      <div>
+                        <div>среднее время</div>
+                        <strong>{activityDetails.fast?.averageTime || "—"}</strong>
+                      </div>
+                    </div>
+                    <div className="activity-stat">
+                      <span>🧭</span>
+                      <div>
+                        <div>средний темп</div>
+                        <strong>{activityDetails.fast?.averagePace || "—"}</strong>
+                      </div>
+                    </div>
+                    <div className="activity-stat">
+                      <span>△</span>
+                      <div>
+                        <div>разброс времени</div>
+                        <strong>{activityDetails.fast?.standardDeviation || "—"}</strong>
+                      </div>
+                    </div>
+                    <div className="activity-stat">
+                      <span>♥</span>
+                      <div>
+                        <div>средний пульс</div>
+                        <strong>{activityDetails.fast?.averageHR || "—"}</strong>
+                      </div>
+                    </div>
+                    <div className="activity-stat">
+                      <span>⇵</span>
+                      <div>
+                        <div>средняя дистанция</div>
+                        <strong>{activityDetails.fast?.averageDistance || "—"}</strong>
+                      </div>
+                    </div>
+                    <div className="activity-stat">
+                      <span>◔</span>
+                      <div>
+                        <div>количество интервалов</div>
+                        <strong>{activityDetails.fast?.count || "—"}</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="activity-column slow">
+                    <h3>Медленно</h3>
+                    <div className="activity-stat">
+                      <span>⏱</span>
+                      <div>
+                        <div>среднее время</div>
+                        <strong>{activityDetails.slow?.averageTime || "—"}</strong>
+                      </div>
+                    </div>
+                    <div className="activity-stat">
+                      <span>🧭</span>
+                      <div>
+                        <div>средний темп</div>
+                        <strong>{activityDetails.slow?.averagePace || "—"}</strong>
+                      </div>
+                    </div>
+                    <div className="activity-stat">
+                      <span>△</span>
+                      <div>
+                        <div>разброс времени</div>
+                        <strong>{activityDetails.slow?.standardDeviation || "—"}</strong>
+                      </div>
+                    </div>
+                    <div className="activity-stat">
+                      <span>♥</span>
+                      <div>
+                        <div>средний пульс</div>
+                        <strong>{activityDetails.slow?.averageHR || "—"}</strong>
+                      </div>
+                    </div>
+                    <div className="activity-stat">
+                      <span>⇵</span>
+                      <div>
+                        <div>средняя дистанция</div>
+                        <strong>{activityDetails.slow?.averageDistance || "—"}</strong>
+                      </div>
+                    </div>
+                    <div className="activity-stat">
+                      <span>◔</span>
+                      <div>
+                        <div>количество интервалов</div>
+                        <strong>{activityDetails.slow?.count || "—"}</strong>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </>
             ) : (
               <>
                 <h2>Выберите событие</h2>
-                <p>Правая панель покажет весь контент тренировки из JSON.</p>
+                <p>Правая панель покажет activity-детали, когда будет доступен `aid`.</p>
               </>
             )}
           </aside>

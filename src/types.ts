@@ -6,6 +6,35 @@ export type TrainingPhase = "base" | "speed" | "development" | "taper" | "race";
 
 export type TrainingSport = "run" | "swim" | "bike" | "other";
 
+export type ActivityDetails = {
+  studentName: string;
+  distance: number;
+  pace: string;
+  bpm: number;
+  cadence: number;
+  impulse: number;
+  gs: number;
+  trainerName?: string;
+  trainerComment?: string;
+  reportComment?: string;
+  fast?: {
+    averageTime: string;
+    averagePace: string;
+    standardDeviation: string;
+    averageHR: number;
+    averageDistance: string;
+    count: number;
+  };
+  slow?: {
+    averageTime: string;
+    averagePace: string;
+    standardDeviation: string;
+    averageHR: number;
+    averageDistance: string;
+    count: number;
+  };
+};
+
 export type CalendarEvent = {
   id: string;
   title: string;
@@ -24,4 +53,5 @@ export type CalendarEvent = {
   intervalCount?: number;
   intervalLength?: number;
   pace?: string;
+  activityId?: string;
 };

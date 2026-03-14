@@ -224,6 +224,140 @@ button {
   white-space: pre-line;
 }
 
+.activity-hero {
+  display: grid;
+  gap: 14px;
+}
+
+.activity-metric {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--portal-blue);
+}
+
+.activity-metric strong {
+  font-size: 30px;
+  line-height: 1;
+  font-weight: 900;
+}
+
+.activity-icon {
+  font-size: 30px;
+  line-height: 1;
+  min-width: 34px;
+  text-align: center;
+  color: var(--portal-blue);
+}
+
+.activity-pulse-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding-top: 12px;
+  border-top: 4px solid #c4d5f6;
+}
+
+.activity-pulse-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.activity-pulse-box strong {
+  font-size: 28px;
+  color: var(--portal-blue);
+}
+
+.activity-mini-label {
+  font-size: 12px;
+  color: var(--portal-blue);
+}
+
+.activity-note {
+  background: #eeefff;
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.activity-note-author {
+  font-weight: 700;
+  color: var(--portal-blue);
+  margin-bottom: 6px;
+}
+
+.activity-note-role {
+  color: #9a9a9a;
+}
+
+.activity-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 12px;
+  border-bottom: 3px solid #d5e0f5;
+}
+
+.activity-tabs span {
+  padding: 10px 0;
+  text-align: center;
+  color: #6d6d6d;
+  font-weight: 700;
+}
+
+.activity-tabs .is-active {
+  color: var(--portal-blue);
+  border-bottom: 3px solid var(--portal-blue);
+  margin-bottom: -3px;
+}
+
+.activity-fact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.activity-column h3 {
+  margin: 6px 0 10px;
+  font-size: 24px;
+  color: var(--portal-blue);
+}
+
+.activity-column.slow h3 {
+  color: #ff605c;
+}
+
+.activity-stat {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.activity-stat > span {
+  min-width: 24px;
+  color: inherit;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.activity-column.slow .activity-stat > span {
+  color: #ff605c;
+}
+
+.activity-stat div div {
+  font-size: 12px;
+  line-height: 1.1;
+}
+
+.activity-stat strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 24px;
+  line-height: 1;
+}
+
 .week-header {
   display: grid;
   grid-template-columns: 70px repeat(7, 1fr);
