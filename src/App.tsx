@@ -20,13 +20,7 @@ import { CalendarEvent, CalendarView } from "./types";
 
 const DAY_MINUTES = 24 * 60;
 const SLOT_HEIGHT = 56;
-
-const TEAM_CALENDARS = [
-  { label: "Бег", color: "#0b4fb3" },
-  { label: "Плавание", color: "#33a0ff" },
-  { label: "Велосипед", color: "#5fa700" },
-  { label: "Прочее", color: "#7986cb" }
-];
+const STUDENT_ID = "7439904";
 
 type DraftEvent = {
   title: string;
@@ -51,8 +45,19 @@ const DEFAULT_DRAFT = (date = new Date()): DraftEvent => ({
   location: ""
 });
 
+function renderDescriptionBlocks(description?: string) {
+  if (!description) {
+    return [];
+  }
+
+  return description
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
 export default function App() {
-  const [view, setView] = useState<CalendarView>("week");
+  const [view, setView] = useState<CalendarView>("month");
   const [cursorDate, setCursorDate] = useState(new Date("2026-03-11T08:00:00"));
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
@@ -76,21 +81,9 @@ export default function App() {
     return events.map((event) => ({
       ...event,
       startDate: parseDateTime(event.start),
-      endDate: parseDateTime(event.end)
+      endDate: parseDateTime(event.end),
+      descriptionLines: renderDescriptionBlocks(event.description)
     }));
-  }, [events]);
-  const summary = useMemo(() => {
-    const all = events.length;
-    const focus = events.filter((event) => event.tag === "focus").length;
-    const personal = events.filter((event) => event.tag === "personal").length;
-    const meeting = events.filter((event) => event.tag === "meeting").length;
-
-    return {
-      all,
-      focus,
-      personal,
-      meeting
-    };
   }, [events]);
 
   const today = new Date("2026-03-11T00:00:00");
@@ -186,102 +179,21 @@ export default function App() {
 
   return (
     <div className="page-shell">
-      <header className="portal-header">
-        <div className="portal-brand">
-          <strong>S10.run</strong>
-          <span>Student</span>
-        </div>
-        <nav className="portal-nav">
-          <button type="button">Модули</button>
-          <button type="button">Доска</button>
-          <button type="button">Дедлайны</button>
-          <button type="button">Календарь</button>
-          <button type="button">Рейтинг</button>
-          <button type="button">Платежи</button>
-        </nav>
-        <div className="portal-meta">
-          <span>Март 2026</span>
-          <button className="portal-user">TS</button>
-        </div>
-      </header>
+      <header className="portal-header" />
 
       <div className="app-shell">
-        <aside className="sidebar">
-          <div className="section-bar">Управление</div>
-          <button className="create-button" onClick={() => openComposer()}>
-            <span className="plus-mark">+</span>
-            Создать
-          </button>
-
-          <section className="mini-card">
-            <div className="mini-card-header">
-              <span>Быстрые фильтры</span>
-              <button>Настроить</button>
-            </div>
-            <div className="filter-list">
-              {[
-                { label: "Все", count: summary.all, tone: "all" },
-                { label: "Бег / работа", count: summary.focus, tone: "focus" },
-                { label: "Вело / доп.", count: summary.meeting, tone: "meeting" },
-                { label: "Плавание", count: summary.personal, tone: "personal" }
-              ].map((filter) => (
-                <div className={`filter-chip filter-chip-${filter.tone}`} key={filter.label}>
-                  <span>{filter.label}</span>
-                  <strong>{filter.count}</strong>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="mini-card compact-calendar">
-            <div className="mini-card-header">
-              <span>{formatMonthLabel(cursorDate)}</span>
-              <button>Сегодня</button>
-            </div>
-            <div className="mini-month-grid">
-              {getMonthGrid(cursorDate).map((day) => (
-                <button
-                  key={day.toISOString()}
-                  className={[
-                    "mini-day",
-                    isSameDay(day, today) ? "is-today" : "",
-                    day.getMonth() !== cursorDate.getMonth() ? "is-muted" : ""
-                  ].join(" ")}
-                  onClick={() => setCursorDate(day)}
-                >
-                  {day.getDate()}
-                </button>
-              ))}
-            </div>
-          </section>
-
-          <section className="mini-card">
-            <div className="mini-card-header">
-              <span>Календари</span>
-              <button>+</button>
-            </div>
-            <div className="calendar-list">
-              {TEAM_CALENDARS.map((calendar) => (
-                <label className="calendar-row" key={calendar.label}>
-                  <input defaultChecked type="checkbox" />
-                  <span className="calendar-dot" style={{ background: calendar.color }} />
-                  <span>{calendar.label}</span>
-                </label>
-              ))}
-            </div>
-          </section>
-        </aside>
-
         <main className="main-panel">
           <header className="topbar">
             <div className="topbar-left">
               <div className="brand-lockup">
-                <div className="brand-mark">
-                  <span />
+                <div className="brand-mark" aria-label="S10 logo">
+                  <span className="brand-s">S</span>
+                  <span className="brand-one">1</span>
+                  <span className="brand-zero">0</span>
+                  <span className="brand-arc" />
                 </div>
                 <div>
-                  <h1>Календарь занятий</h1>
-                  <p>Единая лента занятий, дедлайнов и личных событий</p>
+                  <h1>ID {STUDENT_ID}</h1>
                 </div>
               </div>
               <div className="nav-controls">
@@ -306,184 +218,176 @@ export default function App() {
                   Месяц
                 </button>
               </div>
-              <button className="avatar">TS</button>
-            </div>
-          </header>
-
-          <section className="hero-strip">
-            <div className="hero-text">
-              <div className="section-bar hero-bar">Сводка</div>
-              <strong>В плане {summary.all} тренировок</strong>
-              <p>
-                {summary.focus} беговых сессий, {summary.personal} плавательных, {summary.meeting} вело или
-                дополнительных тренировок
-              </p>
-            </div>
-            <div className="hero-actions">
-              <button>Поделиться</button>
-              <button className="primary" onClick={() => openComposer()}>
+              <button className="primary-action" onClick={() => openComposer()}>
                 Новое событие
               </button>
             </div>
-          </section>
+          </header>
 
-        {view === "week" ? (
-          <section className="calendar-surface week-surface">
-            <div className="surface-title">Расписание недели</div>
-            <div className="week-header">
-              <div className="time-column-header" />
-              {weekDays.map((day) => (
-                <button key={day.toISOString()} className="day-column-header" onClick={() => openComposer(day)}>
-                  <span>{formatShortWeekday(day)}</span>
-                  <strong className={isSameDay(day, today) ? "is-today" : ""}>{formatDayNumber(day)}</strong>
-                </button>
-              ))}
-            </div>
+          {view === "week" ? (
+            <section className="calendar-surface week-surface">
+              <div className="surface-title">Календарь недели</div>
+              <div className="week-header">
+                <div className="time-column-header" />
+                {weekDays.map((day) => (
+                  <button key={day.toISOString()} className="day-column-header" onClick={() => openComposer(day)}>
+                    <span>{formatShortWeekday(day)}</span>
+                    <strong className={isSameDay(day, today) ? "is-today" : ""}>{formatDayNumber(day)}</strong>
+                  </button>
+                ))}
+              </div>
 
-            <div className="week-grid">
-              <div className="time-column">
-                {getHourLabels().map((label) => (
-                  <div className="time-slot-label" key={label}>
+              <div className="week-grid">
+                <div className="time-column">
+                  {getHourLabels().map((label) => (
+                    <div className="time-slot-label" key={label}>
+                      {label}
+                    </div>
+                  ))}
+                </div>
+
+                {weekDays.map((day) => (
+                  <div
+                    className="day-column"
+                    key={day.toISOString()}
+                    onDragOver={(event) => event.preventDefault()}
+                    onDrop={() => {
+                      if (!draggedEventId) {
+                        return;
+                      }
+                      const nextDate = new Date(day);
+                      nextDate.setHours(9, 0, 0, 0);
+                      void moveEvent(draggedEventId, nextDate);
+                      setDraggedEventId(null);
+                    }}
+                  >
+                    {getHourLabels().map((label) => (
+                      <button
+                        className="grid-slot"
+                        key={label}
+                        onClick={() => {
+                          const [hours] = label.split(":");
+                          const nextDate = new Date(day);
+                          nextDate.setHours(Number(hours), 0, 0, 0);
+                          openComposer(nextDate);
+                        }}
+                      />
+                    ))}
+
+                    {visibleEvents
+                      .filter((event) => isSameDay(event.startDate, day))
+                      .map((event) => {
+                        const top = (getMinutesSinceDayStart(event.startDate) / DAY_MINUTES) * SLOT_HEIGHT * 24;
+                        const height =
+                          ((event.endDate.getTime() - event.startDate.getTime()) / (1000 * 60) / DAY_MINUTES) *
+                          SLOT_HEIGHT *
+                          24;
+
+                        return (
+                          <button
+                            draggable
+                            key={event.id}
+                            className={`event-card ${selectedEventId === event.id ? "is-selected" : ""}`}
+                            style={{
+                              top: `${top}px`,
+                              height: `${Math.max(height, 64)}px`,
+                              background: `${event.color}1a`,
+                              borderColor: event.color
+                            }}
+                            onClick={() => setSelectedEventId(event.id)}
+                            onDragStart={() => setDraggedEventId(event.id)}
+                          >
+                            <strong>{event.title}</strong>
+                            <span>
+                              {formatTime(event.startDate)} - {formatTime(event.endDate)}
+                            </span>
+                            {event.descriptionLines.slice(0, 2).map((line) => (
+                              <small key={line}>{line}</small>
+                            ))}
+                          </button>
+                        );
+                      })}
+                  </div>
+                ))}
+              </div>
+            </section>
+          ) : (
+            <section className="calendar-surface month-surface">
+              <div className="surface-title">Календарь месяца</div>
+              <div className="month-header-row">
+                {["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"].map((label) => (
+                  <div key={label} className="month-weekday-label">
                     {label}
                   </div>
                 ))}
               </div>
-
-              {weekDays.map((day) => (
-                <div
-                  className="day-column"
-                  key={day.toISOString()}
-                  onDragOver={(event) => event.preventDefault()}
-                  onDrop={() => {
-                    if (!draggedEventId) {
-                      return;
-                    }
-                    const nextDate = new Date(day);
-                    nextDate.setHours(9, 0, 0, 0);
-                    void moveEvent(draggedEventId, nextDate);
-                    setDraggedEventId(null);
-                  }}
-                >
-                  {getHourLabels().map((label) => (
-                    <button
-                      className="grid-slot"
-                      key={label}
-                      onClick={() => {
-                        const [hours] = label.split(":");
-                        const nextDate = new Date(day);
-                        nextDate.setHours(Number(hours), 0, 0, 0);
-                        openComposer(nextDate);
-                      }}
-                    />
-                  ))}
-
-                  {visibleEvents
-                    .filter((event) => isSameDay(event.startDate, day))
-                    .map((event) => {
-                      const top = (getMinutesSinceDayStart(event.startDate) / DAY_MINUTES) * SLOT_HEIGHT * 24;
-                      const height =
-                        ((event.endDate.getTime() - event.startDate.getTime()) / (1000 * 60) / DAY_MINUTES) *
-                        SLOT_HEIGHT *
-                        24;
-
-                      return (
-                        <button
-                          draggable
-                          key={event.id}
-                          className={`event-card ${selectedEventId === event.id ? "is-selected" : ""}`}
-                          style={{
-                            top: `${top}px`,
-                            height: `${Math.max(height, 40)}px`,
-                            background: `${event.color}1a`,
-                            borderColor: event.color
-                          }}
-                          onClick={() => setSelectedEventId(event.id)}
-                          onDragStart={() => setDraggedEventId(event.id)}
-                        >
-                          <strong>{event.title}</strong>
-                          <span>
-                            {formatTime(event.startDate)} - {formatTime(event.endDate)}
-                          </span>
-                          {event.location ? <small>{event.location}</small> : null}
-                        </button>
-                      );
-                    })}
-                </div>
-              ))}
-            </div>
-          </section>
-        ) : (
-          <section className="calendar-surface month-surface">
-            <div className="surface-title">Календарь месяца</div>
-            <div className="month-header-row">
-              {["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"].map((label) => (
-                <div key={label} className="month-weekday-label">
-                  {label}
-                </div>
-              ))}
-            </div>
-            <div className="month-grid">
-              {monthDays.map((day) => (
-                <button key={day.toISOString()} className="month-cell" onClick={() => openComposer(day)}>
-                  <div className="month-cell-top">
-                    <span
-                      className={[
-                        "month-day-number",
-                        isSameDay(day, today) ? "is-today" : "",
-                        day.getMonth() !== cursorDate.getMonth() ? "is-muted" : ""
-                      ].join(" ")}
-                    >
-                      {day.getDate()}
-                    </span>
+              <div className="month-grid">
+                {monthDays.map((day) => (
+                  <div key={day.toISOString()} className="month-cell">
+                    <div className="month-cell-top">
+                      <span
+                        className={[
+                          "month-day-number",
+                          isSameDay(day, today) ? "is-today" : "",
+                          day.getMonth() !== cursorDate.getMonth() ? "is-muted" : ""
+                        ].join(" ")}
+                      >
+                        {day.getDate()}
+                      </span>
+                    </div>
+                    <div className="month-events">
+                      {visibleEvents
+                        .filter((event) => isSameDay(event.startDate, day))
+                        .map((event) => (
+                          <button
+                            key={event.id}
+                            className={`month-event-card ${selectedEventId === event.id ? "is-selected" : ""}`}
+                            style={{ borderLeftColor: event.color }}
+                            onClick={() => setSelectedEventId(event.id)}
+                          >
+                            <div className="month-event-time">
+                              {formatTime(event.startDate)} {event.title}
+                            </div>
+                            {event.location ? <div className="month-event-phase">{event.location}</div> : null}
+                            {event.descriptionLines.map((line) => (
+                              <div key={line} className="month-event-line">
+                                {line}
+                              </div>
+                            ))}
+                          </button>
+                        ))}
+                    </div>
                   </div>
-                  <div className="month-events">
-                    {visibleEvents
-                      .filter((event) => isSameDay(event.startDate, day))
-                      .slice(0, 3)
-                      .map((event) => (
-                        <button
-                          key={event.id}
-                          className="month-event-pill"
-                          style={{ background: `${event.color}20`, color: event.color }}
-                          onClick={(clickEvent) => {
-                            clickEvent.stopPropagation();
-                            setSelectedEventId(event.id);
-                          }}
-                        >
-                          {formatTime(event.startDate)} {event.title}
-                        </button>
-                      ))}
-                  </div>
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
+                ))}
+              </div>
+            </section>
+          )}
 
           <aside className="details-panel">
             <div className="surface-title">Детали</div>
-          {selectedEvent ? (
-            <>
-              <div className="details-chip" style={{ background: `${selectedEvent.color}20`, color: selectedEvent.color }}>
-                {selectedEvent.tag}
-              </div>
-              <h2>{selectedEvent.title}</h2>
-              <p>
-                {formatTime(parseDateTime(selectedEvent.start))} - {formatTime(parseDateTime(selectedEvent.end))}
-              </p>
-              {selectedEvent.location ? <p>{selectedEvent.location}</p> : null}
-              {selectedEvent.description ? <p>{selectedEvent.description}</p> : null}
-              <div className="details-actions">
-                <button onClick={() => openEditor(selectedEvent.id)}>Редактировать</button>
-                <button className="primary">Поделиться</button>
-              </div>
-            </>
-          ) : (
-            <>
-              <h2>Выберите событие</h2>
-              <p>Правая панель покажет детали, участников и быстрые действия.</p>
-            </>
-          )}
+            {selectedEvent ? (
+              <>
+                <div className="details-chip" style={{ background: `${selectedEvent.color}20`, color: selectedEvent.color }}>
+                  {selectedEvent.tag}
+                </div>
+                <h2>{selectedEvent.title}</h2>
+                <p>
+                  {formatTime(parseDateTime(selectedEvent.start))} - {formatTime(parseDateTime(selectedEvent.end))}
+                </p>
+                {selectedEvent.location ? <p>{selectedEvent.location}</p> : null}
+                {renderDescriptionBlocks(selectedEvent.description).map((line) => (
+                  <p key={line}>{line}</p>
+                ))}
+                <div className="details-actions">
+                  <button onClick={() => openEditor(selectedEvent.id)}>Редактировать</button>
+                </div>
+              </>
+            ) : (
+              <>
+                <h2>Выберите событие</h2>
+                <p>Правая панель покажет весь контент тренировки из JSON.</p>
+              </>
+            )}
           </aside>
         </main>
       </div>
@@ -501,7 +405,6 @@ export default function App() {
                 <input
                   value={draft.title}
                   onChange={(event) => setDraft((current) => ({ ...current, title: event.target.value }))}
-                  placeholder="Например, weekly sync"
                 />
               </label>
               <label>
@@ -533,16 +436,14 @@ export default function App() {
                 <input
                   value={draft.location}
                   onChange={(event) => setDraft((current) => ({ ...current, location: event.target.value }))}
-                  placeholder="Zoom / офис / ссылка"
                 />
               </label>
               <label className="full-width">
                 Описание
                 <textarea
-                  rows={4}
+                  rows={5}
                   value={draft.description}
                   onChange={(event) => setDraft((current) => ({ ...current, description: event.target.value }))}
-                  placeholder="Что важно подготовить"
                 />
               </label>
             </div>
