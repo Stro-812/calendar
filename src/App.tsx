@@ -98,6 +98,7 @@ export default function App() {
   const [composerState, setComposerState] = useState<ComposerState>({ mode: "create", eventId: null });
   const [draggedEventId, setDraggedEventId] = useState<string | null>(null);
   const [activityDetails, setActivityDetails] = useState<ActivityDetails | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(true);
 
   useEffect(() => {
     listEvents().then(setEvents);
@@ -252,7 +253,7 @@ export default function App() {
       <header className="portal-header" />
 
       <div className="app-shell">
-        <main className="main-panel">
+        <main className={`main-panel ${isDetailsOpen ? "" : "is-details-collapsed"}`}>
           <header className="topbar">
             <div className="topbar-left">
               <div className="brand-lockup">
@@ -447,7 +448,16 @@ export default function App() {
             </section>
           )}
 
-          <aside className="details-panel">
+          <button
+            className={`details-toggle ${isDetailsOpen ? "" : "is-collapsed"}`}
+            onClick={() => setIsDetailsOpen((current) => !current)}
+            aria-label={isDetailsOpen ? "Скрыть правую колонку" : "Показать правую колонку"}
+            title={isDetailsOpen ? "Скрыть правую колонку" : "Показать правую колонку"}
+          >
+            {isDetailsOpen ? "→" : "←"}
+          </button>
+
+          <aside className={`details-panel ${isDetailsOpen ? "" : "is-hidden"}`}>
             {activityDetails ? (
               <>
                 <div className="activity-hero">
