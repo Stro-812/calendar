@@ -2,6 +2,10 @@ export type CalendarView = "week" | "month";
 
 export type CalendarTag = "focus" | "meeting" | "personal" | "launch" | "design";
 
+export type TrainingPhase = "base" | "speed" | "development" | "taper" | "race";
+
+export type TrainingSport = "run" | "swim" | "bike" | "other";
+
 export type CalendarEvent = {
   id: string;
   title: string;
@@ -12,4 +16,7 @@ export type CalendarEvent = {
   description?: string;
   location?: string;
   attendees?: string[];
+  phase?: TrainingPhase;
+  trainingType?: string;
+  sport?: TrainingSport;
 };

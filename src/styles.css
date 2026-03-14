@@ -320,6 +320,13 @@ button {
   margin-bottom: 4px;
 }
 
+.sport-icon {
+  display: inline-block;
+  min-width: 18px;
+  margin-right: 4px;
+  text-align: center;
+}
+
 .event-card small {
   margin-top: 2px;
 }

@@ -1,4 +1,4 @@
-import { CalendarEvent, CalendarTag } from "../types";
+import { CalendarEvent, CalendarTag, TrainingPhase, TrainingSport } from "../types";
 import { initialEvents } from "../mockEvents";
 
 const TRAINING_SOURCE_URL =
@@ -35,11 +35,20 @@ let hasLoadedRemote = false;
 
 const SPORT_META: Record<
   string,
-  { color: string; tag: CalendarTag; label: string; defaultHour: number; durationMinutes: number }
+  { tag: CalendarTag; label: string; defaultHour: number; durationMinutes: number; sport: TrainingSport }
 > = {
-  run: { color: "#0b4fb3", tag: "focus", label: "Бег", defaultHour: 7, durationMinutes: 90 },
-  swim: { color: "#33a0ff", tag: "personal", label: "Плавание", defaultHour: 19, durationMinutes: 60 },
-  bike: { color: "#5fa700", tag: "meeting", label: "Велосипед", defaultHour: 18, durationMinutes: 75 }
+  run: { tag: "focus", label: "Бег", defaultHour: 7, durationMinutes: 90, sport: "run" },
+  swim: { tag: "personal", label: "Плавание", defaultHour: 19, durationMinutes: 60, sport: "swim" },
+  bike: { tag: "meeting", label: "Велосипед", defaultHour: 18, durationMinutes: 75, sport: "bike" }
+};
+
+const TYPE_COLORS: Record<string, string> = {
+  длительная: "#5e7ce2",
+  восстановительная: "#7bbf43",
+  силовая: "#ef6c57",
+  развивающая: "#2f80ed",
+  интервальная: "#8e44ad",
+  повторная: "#c0392b"
 };
 
 function delay(ms: number) {
@@ -87,11 +96,11 @@ function buildTrackDescription(track: RawTrack, phase: string) {
 
 function normalizeTrackToEvent(day: RawDiaryTask, track: RawTrack, index: number): CalendarEvent {
   const meta = SPORT_META[track.sport] ?? {
-    color: "#7986cb",
     tag: "design" as const,
     label: track.sport,
     defaultHour: 12,
-    durationMinutes: 60
+    durationMinutes: 60,
+    sport: "other" as const
   };
   const start = new Date(`${day.date}T00:00:00`);
   start.setHours(meta.defaultHour + index * 2, 0, 0, 0);
@@ -102,10 +111,13 @@ function normalizeTrackToEvent(day: RawDiaryTask, track: RawTrack, index: number
     title: `${meta.label} • ${track.type}`,
     start: toLocalDateTime(start),
     end: toLocalDateTime(end),
-    color: meta.color,
+    color: TYPE_COLORS[track.type] ?? "#7986cb",
     tag: meta.tag,
     description: buildTrackDescription(track, day.phase),
-    location: normalizePhaseLabel(day.phase)
+    location: normalizePhaseLabel(day.phase),
+    phase: day.phase as TrainingPhase,
+    trainingType: track.type,
+    sport: meta.sport
   };
 }
 

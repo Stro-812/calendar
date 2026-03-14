@@ -16,11 +16,33 @@ import {
   toLocalInputValue
 } from "./date";
 import { createEvent, listEvents, updateEvent } from "./api/calendarApi";
-import { CalendarEvent, CalendarView } from "./types";
+import { CalendarEvent, CalendarView, TrainingPhase, TrainingSport } from "./types";
 
 const DAY_MINUTES = 24 * 60;
 const SLOT_HEIGHT = 56;
 const STUDENT_ID = "7439904";
+
+const PHASE_STYLES: Record<TrainingPhase, { dayBackground: string; label: string }> = {
+  base: { dayBackground: "#f3f7ff", label: "База" },
+  speed: { dayBackground: "#fff6e8", label: "Скорость" },
+  development: { dayBackground: "#eef9ee", label: "Развитие" },
+  taper: { dayBackground: "#fff4f4", label: "Подводка" },
+  race: { dayBackground: "#fff0f7", label: "Старт" }
+};
+
+const SPORT_ICONS: Record<TrainingSport, string> = {
+  run: "🏃",
+  swim: "🏊",
+  bike: "🚴",
+  other: "•"
+};
+
+const SPORT_LABELS: Record<TrainingSport, string> = {
+  run: "Бег",
+  swim: "Плавание",
+  bike: "Велосипед",
+  other: "Прочее"
+};
 
 type DraftEvent = {
   title: string;
@@ -86,6 +108,19 @@ export default function App() {
     }));
   }, [events]);
 
+  const phaseByDay = useMemo(() => {
+    const map = new Map<string, TrainingPhase>();
+
+    visibleEvents.forEach((event) => {
+      if (!event.phase) {
+        return;
+      }
+      map.set(event.startDate.toDateString(), event.phase);
+    });
+
+    return map;
+  }, [visibleEvents]);
+
   const today = new Date("2026-03-11T00:00:00");
 
   function shiftPeriod(direction: -1 | 1) {
@@ -139,7 +174,8 @@ export default function App() {
       color: draft.color,
       tag: "meeting",
       description: draft.description.trim(),
-      location: draft.location.trim()
+      location: draft.location.trim(),
+      sport: "other"
     };
 
     if (composerState.mode === "edit" && composerState.eventId) {
@@ -250,6 +286,11 @@ export default function App() {
                   <div
                     className="day-column"
                     key={day.toISOString()}
+                    style={{
+                      background: phaseByDay.get(day.toDateString())
+                        ? PHASE_STYLES[phaseByDay.get(day.toDateString())!].dayBackground
+                        : "#fff"
+                    }}
                     onDragOver={(event) => event.preventDefault()}
                     onDrop={() => {
                       if (!draggedEventId) {
@@ -297,7 +338,10 @@ export default function App() {
                             onClick={() => setSelectedEventId(event.id)}
                             onDragStart={() => setDraggedEventId(event.id)}
                           >
-                            <strong>{event.title}</strong>
+                            <strong>
+                              <span className="sport-icon">{SPORT_ICONS[event.sport ?? "other"]}</span>
+                              {event.title}
+                            </strong>
                             <span>
                               {formatTime(event.startDate)} - {formatTime(event.endDate)}
                             </span>
@@ -323,7 +367,15 @@ export default function App() {
               </div>
               <div className="month-grid">
                 {monthDays.map((day) => (
-                  <div key={day.toISOString()} className="month-cell">
+                  <div
+                    key={day.toISOString()}
+                    className="month-cell"
+                    style={{
+                      background: phaseByDay.get(day.toDateString())
+                        ? PHASE_STYLES[phaseByDay.get(day.toDateString())!].dayBackground
+                        : "#fff"
+                    }}
+                  >
                     <div className="month-cell-top">
                       <span
                         className={[
@@ -346,9 +398,12 @@ export default function App() {
                             onClick={() => setSelectedEventId(event.id)}
                           >
                             <div className="month-event-time">
+                              <span className="sport-icon">{SPORT_ICONS[event.sport ?? "other"]}</span>
                               {formatTime(event.startDate)} {event.title}
                             </div>
-                            {event.location ? <div className="month-event-phase">{event.location}</div> : null}
+                            <div className="month-event-phase">
+                              {event.phase ? PHASE_STYLES[event.phase].label : event.location}
+                            </div>
                             {event.descriptionLines.map((line) => (
                               <div key={line} className="month-event-line">
                                 {line}
@@ -371,6 +426,9 @@ export default function App() {
                   {selectedEvent.tag}
                 </div>
                 <h2>{selectedEvent.title}</h2>
+                {selectedEvent.phase ? <p>Фаза: {PHASE_STYLES[selectedEvent.phase].label}</p> : null}
+                {selectedEvent.trainingType ? <p>Тип: {selectedEvent.trainingType}</p> : null}
+                {selectedEvent.sport ? <p>Спорт: {SPORT_ICONS[selectedEvent.sport]} {SPORT_LABELS[selectedEvent.sport]}</p> : null}
                 <p>
                   {formatTime(parseDateTime(selectedEvent.start))} - {formatTime(parseDateTime(selectedEvent.end))}
                 </p>
