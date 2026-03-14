@@ -44,11 +44,12 @@ const SPORT_META: Record<
 
 const TYPE_COLORS: Record<string, string> = {
   длительная: "#5e7ce2",
-  восстановительная: "#7bbf43",
-  силовая: "#ef6c57",
+  восстановительная: "#6bbf59",
+  интервальная: "#ff5aa5",
+  повторная: "#ff9f43",
   развивающая: "#2f80ed",
-  интервальная: "#8e44ad",
-  повторная: "#c0392b"
+  силовая: "#7a5cff",
+  соревнование: "#111111"
 };
 
 function delay(ms: number) {
@@ -117,7 +118,12 @@ function normalizeTrackToEvent(day: RawDiaryTask, track: RawTrack, index: number
     location: normalizePhaseLabel(day.phase),
     phase: day.phase as TrainingPhase,
     trainingType: track.type,
-    sport: meta.sport
+    sport: meta.sport,
+    task: track.task,
+    report: track.report,
+    intervalCount: track.json?.numbOfIntervals || undefined,
+    intervalLength: track.json?.lengthOfIntervals || undefined,
+    pace: track.json?.pace || undefined
   };
 }
 

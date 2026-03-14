@@ -23,11 +23,11 @@ const SLOT_HEIGHT = 56;
 const STUDENT_ID = "7439904";
 
 const PHASE_STYLES: Record<TrainingPhase, { dayBackground: string; label: string }> = {
-  base: { dayBackground: "#f3f7ff", label: "База" },
-  speed: { dayBackground: "#fff6e8", label: "Скорость" },
-  development: { dayBackground: "#eef9ee", label: "Развитие" },
-  taper: { dayBackground: "#fff4f4", label: "Подводка" },
-  race: { dayBackground: "#fff0f7", label: "Старт" }
+  base: { dayBackground: "#eef9ee", label: "База" },
+  speed: { dayBackground: "#fff0f7", label: "Скорость" },
+  development: { dayBackground: "#eef5ff", label: "Развитие" },
+  taper: { dayBackground: "#fff4e8", label: "Тейпер" },
+  race: { dayBackground: "#f1f1f1", label: "Старт" }
 };
 
 const SPORT_ICONS: Record<TrainingSport, string> = {
@@ -78,6 +78,14 @@ function renderDescriptionBlocks(description?: string) {
     .filter(Boolean);
 }
 
+function formatIntervalLine(event: CalendarEvent) {
+  if (!event.intervalCount || !event.intervalLength || !event.pace) {
+    return null;
+  }
+
+  return `${event.intervalCount} x ${event.intervalLength.toString().replace(".", ",")} @ ${event.pace}`;
+}
+
 export default function App() {
   const [view, setView] = useState<CalendarView>("month");
   const [cursorDate, setCursorDate] = useState(new Date("2026-03-11T08:00:00"));
@@ -104,7 +112,8 @@ export default function App() {
       ...event,
       startDate: parseDateTime(event.start),
       endDate: parseDateTime(event.end),
-      descriptionLines: renderDescriptionBlocks(event.description)
+      descriptionLines: renderDescriptionBlocks(event.description),
+      intervalLine: formatIntervalLine(event)
     }));
   }, [events]);
 
@@ -345,9 +354,9 @@ export default function App() {
                             <span>
                               {formatTime(event.startDate)} - {formatTime(event.endDate)}
                             </span>
-                            {event.descriptionLines.slice(0, 2).map((line) => (
-                              <small key={line}>{line}</small>
-                            ))}
+                            {event.task ? <small>{event.task}</small> : null}
+                            {event.intervalLine ? <small className="event-interval">{event.intervalLine}</small> : null}
+                            {event.report ? <small>{event.report}</small> : null}
                           </button>
                         );
                       })}
@@ -401,14 +410,9 @@ export default function App() {
                               <span className="sport-icon">{SPORT_ICONS[event.sport ?? "other"]}</span>
                               {formatTime(event.startDate)} {event.title}
                             </div>
-                            <div className="month-event-phase">
-                              {event.phase ? PHASE_STYLES[event.phase].label : event.location}
-                            </div>
-                            {event.descriptionLines.map((line) => (
-                              <div key={line} className="month-event-line">
-                                {line}
-                              </div>
-                            ))}
+                            {event.task ? <div className="month-event-line">{event.task}</div> : null}
+                            {event.intervalLine ? <div className="month-event-line month-event-interval">{event.intervalLine}</div> : null}
+                            {event.report ? <div className="month-event-line">{event.report}</div> : null}
                           </button>
                         ))}
                     </div>
@@ -432,10 +436,9 @@ export default function App() {
                 <p>
                   {formatTime(parseDateTime(selectedEvent.start))} - {formatTime(parseDateTime(selectedEvent.end))}
                 </p>
-                {selectedEvent.location ? <p>{selectedEvent.location}</p> : null}
-                {renderDescriptionBlocks(selectedEvent.description).map((line) => (
-                  <p key={line}>{line}</p>
-                ))}
+                {selectedEvent.task ? <p>{selectedEvent.task}</p> : null}
+                {formatIntervalLine(selectedEvent) ? <p>{formatIntervalLine(selectedEvent)}</p> : null}
+                {selectedEvent.report ? <p>{selectedEvent.report}</p> : null}
                 <div className="details-actions">
                   <button onClick={() => openEditor(selectedEvent.id)}>Редактировать</button>
                 </div>

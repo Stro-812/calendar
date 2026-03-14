@@ -331,6 +331,12 @@ button {
   margin-top: 2px;
 }
 
+.event-interval,
+.month-event-interval {
+  font-weight: 700;
+  color: var(--portal-blue-dark);
+}
+
 .event-card.is-selected,
 .month-event-card.is-selected {
   outline: 2px solid var(--portal-blue);

@@ -19,4 +19,9 @@ export type CalendarEvent = {
   phase?: TrainingPhase;
   trainingType?: string;
   sport?: TrainingSport;
+  task?: string;
+  report?: string;
+  intervalCount?: number;
+  intervalLength?: number;
+  pace?: string;
 };
