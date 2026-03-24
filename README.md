@@ -1,44 +1,65 @@
-# Calendar Frontend
+# Run Screenshot Parser
 
-React/Vite frontend for a Google Calendar-like scheduling interface. The current version focuses on the visual layer and frontend UX, with an in-memory mock API that can later be replaced by a real backend.
+Standalone web service: a user opens a URL, uploads a running screenshot, and immediately gets two values back:
 
-## Features
+- distance in kilometers
+- workout duration
 
-- Week view with time grid
-- Month view
-- Event cards
-- Event details panel
-- Create event modal
-- Edit existing event
-- Drag-and-drop between days in week view
-- Mock API layer prepared for backend replacement
+The frontend is built with React + Vite. The backend is a lightweight API route that sends the image to OpenAI `Responses API` and requires a strict JSON response.
+
+## How it works
+
+1. The browser reads the uploaded screenshot as a base64 data URL.
+2. The frontend sends it to `POST /api/run-parse`.
+3. The backend calls OpenAI with image input.
+4. The model returns structured JSON:
+
+```json
+{
+  "distance_km": 5.24,
+  "duration_seconds": 1532,
+  "duration_text": "25:32",
+  "confidence": 0.94,
+  "notes": ""
+}
+```
 
 ## Project structure
 
-- `src/App.tsx` - main calendar screen and interactions
-- `src/api/calendarApi.ts` - mock API adapter
-- `src/mockEvents.ts` - initial event data
-- `src/date.ts` - date helpers
-- `src/types.ts` - shared event/view types
-- `src/styles.css` - full UI styling
+- `src/App.tsx` - standalone upload interface
+- `src/api/runParserApi.ts` - browser client for the backend route
+- `lib/runParser.js` - OpenAI request and response normalization
+- `api/run-parse.js` - serverless API route for production hosting
+- `vite.config.ts` - local dev middleware for `/api/run-parse`
+
+## Environment variables
+
+Create an env file or set variables in your hosting platform:
+
+```bash
+OPENAI_API_KEY=your_key_here
+OPENAI_VISION_MODEL=gpt-4o-mini
+```
+
+`OPENAI_VISION_MODEL` is optional.
 
 ## Run locally
 
-This environment did not have `node` or `npm`, so the app was prepared manually and not executed here.
-
-Once Node.js is installed:
-
 ```bash
 npm install
-npm run dev
+OPENAI_API_KEY=your_key_here npm run dev
 ```
 
-## Next backend integration step
+Then open the local URL shown by Vite.
 
-Replace the functions in `src/api/calendarApi.ts`:
+## Production deploy
 
-- `listEvents()`
-- `createEvent()`
-- `updateEvent()`
+This repo is ready to be deployed as a separate internet service.
 
-with real HTTP requests to your backend.
+Typical setup:
+
+1. Deploy the project to Vercel.
+2. Add `OPENAI_API_KEY` in project environment variables.
+3. Attach your domain or subdomain, for example `run.yourdomain.com`.
+
+The frontend will stay on the same origin as the backend route, so the browser can call `/api/run-parse` directly without extra CORS setup.
