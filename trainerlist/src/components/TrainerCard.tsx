@@ -1,7 +1,12 @@
-import { Trainer } from "../types";
+import { useState } from "react";
+import { DISCIPLINE_META, PRIORITIES, PRIORITY_LABEL } from "../constants";
+import { PriorityKey } from "../types";
+import { RankedTrainer } from "../api/trainerListApi";
+import { ScoreBadge } from "./ScoreBadge";
 
 interface TrainerCardProps {
-  trainer: Trainer;
+  trainer: RankedTrainer;
+  priorities: PriorityKey[];
 }
 
 function getInitials(name: string): string {
@@ -14,11 +19,29 @@ function getInitials(name: string): string {
     .toUpperCase();
 }
 
-export function TrainerCard({ trainer }: TrainerCardProps) {
+function ComponentBar({ label, value, highlight }: { label: string; value: number; highlight?: boolean }) {
   return (
-    <article className="trainer-card">
-      <div className="trainer-card__head">
-        <div className="trainer-avatar" aria-hidden={trainer.avatarUrl ? undefined : true}>
+    <div className={`cbar ${highlight ? "cbar--hl" : ""}`}>
+      <span className="cbar__label">{label}</span>
+      <span className="cbar__track">
+        <span className="cbar__fill" style={{ width: `${value * 10}%` }} />
+      </span>
+      <span className="cbar__value">{value.toFixed(1)}</span>
+    </div>
+  );
+}
+
+export function TrainerCard({ trainer, priorities }: TrainerCardProps) {
+  const [expanded, setExpanded] = useState(false);
+
+  const priceText = `${trainer.priceFrom ? "от " : ""}${trainer.price.toLocaleString("ru-RU")} ${
+    trainer.currency === "RUB" ? "₽" : "€"
+  }`;
+
+  return (
+    <article className="card">
+      <header className="card__head">
+        <div className="avatar">
           {trainer.avatarUrl ? (
             <img src={trainer.avatarUrl} alt={trainer.name} />
           ) : (
@@ -26,27 +49,61 @@ export function TrainerCard({ trainer }: TrainerCardProps) {
           )}
         </div>
 
-        <div className="trainer-card__title">
-          <h3>{trainer.name}</h3>
-          <p className="trainer-card__spec">{trainer.specialization}</p>
+        <div className="card__id">
+          <h3 className="card__name">{trainer.name}</h3>
+          {trainer.handle ? <p className="card__handle">{trainer.handle}</p> : null}
+          <div className="card__disciplines">
+            {trainer.disciplines.map((d) => (
+              <span key={d} className="discipline" title={DISCIPLINE_META[d].label}>
+                <span aria-hidden="true">{DISCIPLINE_META[d].icon}</span> {DISCIPLINE_META[d].label}
+              </span>
+            ))}
+          </div>
         </div>
 
-        <span className={`trainer-status ${trainer.isAvailable ? "is-available" : "is-busy"}`}>
-          {trainer.isAvailable ? "Свободен" : "Занят"}
-        </span>
-      </div>
+        <ScoreBadge score={trainer.rankedByPriorities ? trainer.rankScore : trainer.overallScore} />
+      </header>
 
-      <div className="trainer-card__meta">
-        <span>⭐ {trainer.rating.toFixed(1)} ({trainer.reviewsCount})</span>
-        <span>{trainer.experienceYears} лет опыта</span>
-        <span>{trainer.pricePerSession.toLocaleString("ru-RU")} ₽ / занятие</span>
-      </div>
+      <p className="card__desc">{trainer.description}</p>
 
-      <ul className="trainer-card__tags">
-        {trainer.tags.map((tag) => (
-          <li key={tag}>{tag}</li>
-        ))}
-      </ul>
+      {priorities.length > 0 ? (
+        <div className="card__match">
+          <p className="card__match-title">По вашим приоритетам</p>
+          {priorities.map((key) => (
+            <ComponentBar key={key} label={PRIORITY_LABEL[key]} value={trainer.components[key]} highlight />
+          ))}
+        </div>
+      ) : null}
+
+      {expanded ? (
+        <div className="card__breakdown">
+          <p className="card__match-title">Из чего складывается рейтинг</p>
+          {PRIORITIES.map((p) => (
+            <ComponentBar
+              key={p.key}
+              label={p.label}
+              value={trainer.components[p.key]}
+              highlight={priorities.includes(p.key)}
+            />
+          ))}
+        </div>
+      ) : null}
+
+      <footer className="card__foot">
+        <div className="card__price">
+          <strong>{priceText}</strong>
+          {trainer.remote ? <span className="tag-remote">🌍 Удалённо</span> : null}
+        </div>
+
+        <div className="card__actions">
+          <button type="button" className="link-button" onClick={() => setExpanded((v) => !v)}>
+            {expanded ? "Свернуть" : "Из чего складывается"}
+          </button>
+          <button type="button" className="btn-primary">
+            Профиль тренера
+          </button>
+        </div>
+      </footer>
     </article>
   );
 }

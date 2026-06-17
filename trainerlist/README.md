@@ -6,16 +6,28 @@ running it does not touch the root app or the calendar.
 
 ## Status
 
-Scaffold + working baseline UI on mock data. The content model (a trainer catalog with cards,
-filters, search, sorting) is a **placeholder** and should be aligned with the real page once the
-data model is confirmed.
+Redesign prototype on mock data. Implements the UX-audit recommendations:
+
+- **«Что для вас важнее всего?»** — choose up to 3 rating components; counter `N/3`, remaining
+  options dim when the limit is reached.
+- The list **re-ranks by the selected priorities** (and shows "Отсортировано по вашим приоритетам").
+- Each card shows a **numeric score (X.0 / 10)** instead of a row of stars, plus an expandable
+  "Из чего складывается рейтинг" breakdown.
+- When priorities are chosen, the matching components are **highlighted in the card** with mini bars.
+- Cleaner card: 2-line description clamp, labelled discipline chips, clear "Удалённо" tag, single
+  price format, "Профиль тренера" action.
+
+Mock data fields are placeholders to be aligned with the real backend model.
 
 ## Project structure
 
-- `src/App.tsx` — page shell, filter state, data loading
-- `src/components/TrainerCard.tsx` — single trainer card
-- `src/components/FilterBar.tsx` — search / specialization / sort / availability controls
-- `src/api/trainerListApi.ts` — in-memory mock API (replace with real HTTP calls)
+- `src/App.tsx` — page shell, filter/priority state, results bar
+- `src/components/PriorityPicker.tsx` — "choose up to 3" rating components
+- `src/components/Filters.tsx` — disciplines / currency / keywords / tags
+- `src/components/TrainerCard.tsx` — trainer card with score + breakdown
+- `src/components/ScoreBadge.tsx` — numeric rating badge
+- `src/api/trainerListApi.ts` — in-memory mock API with priority-based ranking
+- `src/constants.ts` — priority and discipline metadata
 - `src/mockTrainers.ts` — placeholder data
 - `src/types.ts` — shared types
 - `src/styles.css` — all styling

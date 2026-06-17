@@ -1,20 +1,21 @@
-import { useEffect, useState } from "react";
-import { listTrainers } from "./api/trainerListApi";
-import { FilterBar } from "./components/FilterBar";
+import { useEffect, useMemo, useState } from "react";
+import { listTrainers, RankedTrainer } from "./api/trainerListApi";
+import { FiltersPanel } from "./components/Filters";
+import { PriorityPicker } from "./components/PriorityPicker";
 import { TrainerCard } from "./components/TrainerCard";
-import { specializations } from "./mockTrainers";
-import { Trainer, TrainerListFilters } from "./types";
+import { Filters } from "./types";
 
-const initialFilters: TrainerListFilters = {
-  search: "",
-  specialization: null,
-  onlyAvailable: false,
-  sortBy: "rating"
+const initialFilters: Filters = {
+  disciplines: [],
+  currency: null,
+  priorities: [],
+  keywords: "",
+  tags: ""
 };
 
 export default function App() {
-  const [filters, setFilters] = useState<TrainerListFilters>(initialFilters);
-  const [trainers, setTrainers] = useState<Trainer[]>([]);
+  const [filters, setFilters] = useState<Filters>(initialFilters);
+  const [trainers, setTrainers] = useState<RankedTrainer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -33,27 +34,50 @@ export default function App() {
     };
   }, [filters]);
 
-  function updateFilters(next: Partial<TrainerListFilters>) {
+  function updateFilters(next: Partial<Filters>) {
     setFilters((current) => ({ ...current, ...next }));
   }
+
+  const countText = useMemo(() => {
+    const n = trainers.length;
+    const forms: [string, string, string] = ["тренер", "тренера", "тренеров"];
+    const mod10 = n % 10;
+    const mod100 = n % 100;
+    let form = forms[2];
+    if (mod10 === 1 && mod100 !== 11) form = forms[0];
+    else if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) form = forms[1];
+    return `${n} ${form}`;
+  }, [trainers.length]);
 
   return (
     <div className="page">
       <header className="page-header">
-        <p className="eyebrow">s10.run</p>
-        <h1>Тренеры</h1>
-        <p className="page-subtitle">Выберите тренера по направлению, рейтингу и доступности.</p>
+        <p className="eyebrow">S10.run</p>
+        <h1>Найти тренера</h1>
+        <p className="page-subtitle">Подберите тренера под свои цели — список ранжируется по тому, что важно вам.</p>
       </header>
 
-      <FilterBar filters={filters} specializations={specializations} onChange={updateFilters} />
+      <PriorityPicker
+        selected={filters.priorities}
+        onChange={(priorities) => updateFilters({ priorities })}
+      />
 
-      <main className="trainer-grid" aria-busy={isLoading}>
-        {isLoading ? (
-          <p className="state-message">Загрузка…</p>
-        ) : trainers.length === 0 ? (
-          <p className="state-message">По заданным фильтрам тренеры не найдены.</p>
+      <FiltersPanel filters={filters} onChange={updateFilters} onReset={() => setFilters(initialFilters)} />
+
+      <div className="results-bar">
+        <span className="results-bar__count">{isLoading ? "Загрузка…" : `Найдено: ${countText}`}</span>
+        <span className="results-bar__sort">
+          {filters.priorities.length > 0 ? "Отсортировано по вашим приоритетам" : "Отсортировано по рейтингу"}
+        </span>
+      </div>
+
+      <main className="list" aria-busy={isLoading}>
+        {!isLoading && trainers.length === 0 ? (
+          <p className="state-message">По заданным условиям тренеры не найдены. Попробуйте смягчить фильтры.</p>
         ) : (
-          trainers.map((trainer) => <TrainerCard key={trainer.id} trainer={trainer} />)
+          trainers.map((trainer) => (
+            <TrainerCard key={trainer.id} trainer={trainer} priorities={filters.priorities} />
+          ))
         )}
       </main>
     </div>
