@@ -59,59 +59,17 @@ body {
 
 /* ---- Hero banner ---- */
 .hero {
-  position: relative;
-  overflow: hidden;
   border-radius: var(--radius);
-  min-height: 260px;
-  display: flex;
-  align-items: center;
+  overflow: hidden;
   margin-bottom: 16px;
-  /* Swap this gradient for `url(...)` once a real photo is available. */
-  background:
-    radial-gradient(120% 120% at 85% 10%, rgba(98, 152, 255, 0.45) 0%, rgba(98, 152, 255, 0) 55%),
-    linear-gradient(115deg, #0a1c47 0%, #15357e 50%, #2a5bbf 100%);
   box-shadow: var(--shadow);
+  line-height: 0;
 }
 
-.hero__overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, rgba(6, 16, 41, 0.78) 0%, rgba(6, 16, 41, 0.35) 55%, rgba(6, 16, 41, 0) 100%);
-}
-
-.hero__content {
-  position: relative;
-  padding: 32px 28px;
-  color: #fff;
-  max-width: 70%;
-}
-
-.hero__title {
-  margin: 0;
-  font-size: 46px;
-  line-height: 0.98;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
-}
-
-.hero__stat {
-  margin: 18px 0 6px;
-  font-size: 17px;
-  font-weight: 600;
-  padding-left: 12px;
-  border-left: 3px solid var(--accent);
-}
-
-.hero__stat strong {
-  color: var(--accent);
-  font-size: 20px;
-}
-
-.hero__subtitle {
-  margin: 0;
-  font-size: 13px;
-  opacity: 0.85;
+.hero__image {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 /* ---- Winners carousel ---- */
@@ -239,15 +197,6 @@ body {
 }
 
 @media (max-width: 520px) {
-  .hero__title {
-    font-size: 36px;
-  }
-
-  .hero__content {
-    max-width: 85%;
-    padding: 24px 20px;
-  }
-
   .winners__nav {
     display: none;
   }
