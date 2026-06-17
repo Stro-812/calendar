@@ -31,6 +31,17 @@ export interface Trainer {
   tags: string[];
 }
 
+/** A trainer featured in the "Победители челленджей" carousel. */
+export interface ChallengeWinner {
+  id: string;
+  name: string;
+  avatarUrl: string | null;
+  score: number;
+  discipline: DisciplineKey;
+  /** Name of the challenge this trainer won. */
+  challenge: string;
+}
+
 export interface Filters {
   disciplines: DisciplineKey[];
   currency: Currency | null;

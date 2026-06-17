@@ -1,4 +1,4 @@
-import { Trainer } from "./types";
+import { ChallengeWinner, Trainer } from "./types";
 
 // Placeholder data modelled on the real page. Sub-scores are 0–10 per component.
 export const mockTrainers: Trainer[] = [
@@ -139,5 +139,49 @@ export const mockTrainers: Trainer[] = [
     currency: "RUB",
     remote: true,
     tags: ["Мотивация", "Команда"]
+  }
+];
+
+// Curated list shown in the "Победители челленджей" carousel.
+export const challengeWinners: ChallengeWinner[] = [
+  {
+    id: "w-1",
+    name: "Юрий Строфилов",
+    avatarUrl: null,
+    score: 9.1,
+    discipline: "run",
+    challenge: "Весенний марафон 2026"
+  },
+  {
+    id: "w-2",
+    name: "Анастасия Шелковина",
+    avatarUrl: null,
+    score: 8.2,
+    discipline: "swim",
+    challenge: "100 км за месяц"
+  },
+  {
+    id: "w-3",
+    name: "Юрий Чернополечий",
+    avatarUrl: null,
+    score: 8.8,
+    discipline: "bike",
+    challenge: "Триатлон-старт"
+  },
+  {
+    id: "w-4",
+    name: "Дмитрий Познышев",
+    avatarUrl: null,
+    score: 8.4,
+    discipline: "run",
+    challenge: "Первая десятка"
+  },
+  {
+    id: "w-5",
+    name: "Андрей Елизарьев",
+    avatarUrl: null,
+    score: 7.9,
+    discipline: "run",
+    challenge: "Бег в удовольствие"
   }
 ];

@@ -3,6 +3,9 @@ import { DisciplineKey, PriorityKey } from "./types";
 /** A user may emphasise at most this many rating components. */
 export const MAX_PRIORITIES = 3;
 
+/** Total trainers in the catalog — placeholder for the hero stat. */
+export const TOTAL_TRAINERS = 170;
+
 export interface PriorityMeta {
   key: PriorityKey;
   label: string;

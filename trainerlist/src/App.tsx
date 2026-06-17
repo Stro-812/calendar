@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { listTrainers, RankedTrainer } from "./api/trainerListApi";
 import { FiltersPanel } from "./components/Filters";
+import { HeroBanner } from "./components/HeroBanner";
 import { PriorityPicker } from "./components/PriorityPicker";
 import { TrainerCard } from "./components/TrainerCard";
+import { WinnersCarousel } from "./components/WinnersCarousel";
+import { challengeWinners } from "./mockTrainers";
 import { Filters } from "./types";
 
 const initialFilters: Filters = {
@@ -51,11 +54,13 @@ export default function App() {
 
   return (
     <div className="page">
-      <header className="page-header">
-        <p className="eyebrow">S10.run</p>
-        <h1>Найти тренера</h1>
-        <p className="page-subtitle">Подберите тренера под свои цели — список ранжируется по тому, что важно вам.</p>
-      </header>
+      <HeroBanner />
+
+      <WinnersCarousel winners={challengeWinners} />
+
+      <p className="page-subtitle page-subtitle--lead">
+        Подберите тренера под свои цели — список ранжируется по тому, что важно вам.
+      </p>
 
       <PriorityPicker
         selected={filters.priorities}
