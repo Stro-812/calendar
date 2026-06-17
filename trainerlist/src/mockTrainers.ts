@@ -1,12 +1,25 @@
 import { ChallengeWinner, Trainer } from "./types";
 
+// Portrait photos for the prototype. These are loaded in the browser from a
+// public placeholder service (randomuser.me); swap for self-hosted assets once
+// real trainer photos are available. Keyed for reuse between the list and the
+// winners carousel so the same person keeps the same face.
+const PORTRAIT = {
+  yuriStrofilov: "https://randomuser.me/api/portraits/men/32.jpg",
+  dmitryPoznyshev: "https://randomuser.me/api/portraits/men/45.jpg",
+  petrShibanov: "https://randomuser.me/api/portraits/men/67.jpg",
+  yuriChernopolechiy: "https://randomuser.me/api/portraits/men/12.jpg",
+  andreyElizarev: "https://randomuser.me/api/portraits/men/76.jpg",
+  anastasiaShelkovina: "https://randomuser.me/api/portraits/women/44.jpg"
+} as const;
+
 // Placeholder data modelled on the real page. Sub-scores are 0–10 per component.
 export const mockTrainers: Trainer[] = [
   {
     id: "t-1",
     name: "Юрий Строфилов",
     handle: "Stro_team (Дежурный тренер)",
-    avatarUrl: null,
+    avatarUrl: PORTRAIT.yuriStrofilov,
     overallScore: 9.1,
     components: {
       studentProgress: 9.4,
@@ -29,7 +42,7 @@ export const mockTrainers: Trainer[] = [
     id: "t-2",
     name: "Дмитрий Познышев",
     handle: null,
-    avatarUrl: null,
+    avatarUrl: PORTRAIT.dmitryPoznyshev,
     overallScore: 8.4,
     components: {
       studentProgress: 8.7,
@@ -52,7 +65,7 @@ export const mockTrainers: Trainer[] = [
     id: "t-3",
     name: "Пётр Шибанов",
     handle: null,
-    avatarUrl: null,
+    avatarUrl: PORTRAIT.petrShibanov,
     overallScore: 8.0,
     components: {
       studentProgress: 7.8,
@@ -75,7 +88,7 @@ export const mockTrainers: Trainer[] = [
     id: "t-4",
     name: "Юрий Чернополечий",
     handle: null,
-    avatarUrl: null,
+    avatarUrl: PORTRAIT.yuriChernopolechiy,
     overallScore: 8.8,
     components: {
       studentProgress: 9.2,
@@ -98,7 +111,7 @@ export const mockTrainers: Trainer[] = [
     id: "t-5",
     name: "Андрей Елизарьев",
     handle: null,
-    avatarUrl: null,
+    avatarUrl: PORTRAIT.andreyElizarev,
     overallScore: 7.9,
     components: {
       studentProgress: 8.0,
@@ -121,7 +134,7 @@ export const mockTrainers: Trainer[] = [
     id: "t-6",
     name: "Анастасия Шелковина",
     handle: null,
-    avatarUrl: null,
+    avatarUrl: PORTRAIT.anastasiaShelkovina,
     overallScore: 8.2,
     components: {
       studentProgress: 8.5,
@@ -147,7 +160,7 @@ export const challengeWinners: ChallengeWinner[] = [
   {
     id: "w-1",
     name: "Юрий Строфилов",
-    avatarUrl: null,
+    avatarUrl: PORTRAIT.yuriStrofilov,
     score: 9.1,
     discipline: "run",
     challenge: "Весенний марафон 2026"
@@ -155,7 +168,7 @@ export const challengeWinners: ChallengeWinner[] = [
   {
     id: "w-2",
     name: "Анастасия Шелковина",
-    avatarUrl: null,
+    avatarUrl: PORTRAIT.anastasiaShelkovina,
     score: 8.2,
     discipline: "swim",
     challenge: "100 км за месяц"
@@ -163,7 +176,7 @@ export const challengeWinners: ChallengeWinner[] = [
   {
     id: "w-3",
     name: "Юрий Чернополечий",
-    avatarUrl: null,
+    avatarUrl: PORTRAIT.yuriChernopolechiy,
     score: 8.8,
     discipline: "bike",
     challenge: "Триатлон-старт"
@@ -171,7 +184,7 @@ export const challengeWinners: ChallengeWinner[] = [
   {
     id: "w-4",
     name: "Дмитрий Познышев",
-    avatarUrl: null,
+    avatarUrl: PORTRAIT.dmitryPoznyshev,
     score: 8.4,
     discipline: "run",
     challenge: "Первая десятка"
@@ -179,7 +192,7 @@ export const challengeWinners: ChallengeWinner[] = [
   {
     id: "w-5",
     name: "Андрей Елизарьев",
-    avatarUrl: null,
+    avatarUrl: PORTRAIT.andreyElizarev,
     score: 7.9,
     discipline: "run",
     challenge: "Бег в удовольствие"
