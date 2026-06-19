@@ -1,10 +1,11 @@
-name: Deploy AI query prototype
+name: Deploy prototypes to GitHub Pages
 
 on:
   push:
     branches:
       - claude/ai-query-page-design-3mwhgn
     paths:
+      - "trainerlist/**"
       - "ai-query-prototype/**"
       - ".github/workflows/deploy-ai-query.yml"
   workflow_dispatch:
@@ -19,13 +20,29 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: trainerlist/package-lock.json
+
+      - name: Install trainerlist dependencies
+        working-directory: trainerlist
+        run: npm ci
+
+      - name: Build trainerlist
+        working-directory: trainerlist
+        run: npm run build
+        env:
+          BASE_PATH: /calendar/
+
+      - name: Add AI query prototype at /ai-query/
+        run: mkdir -p trainerlist/dist/ai-query && cp ai-query-prototype/index.html trainerlist/dist/ai-query/index.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -35,8 +52,15 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ai-query-prototype
+          path: trainerlist/dist
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
