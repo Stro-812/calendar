@@ -73,36 +73,29 @@
     .nav a.active { color: var(--blue); font-weight: 600; }
 
     /* ── HERO BANNER ────────────────────────── */
-    .hero {
-      position: relative;
-      width: 100%;
-      overflow: hidden;
-      border-bottom: 1px solid var(--border);
-    }
+    .hero { width: 100%; }
     .hero-img {
       width: 100%;
       display: block;
-      max-height: 400px;
+      max-height: 380px;
       object-fit: cover;
       object-position: center top;
     }
-    .hero-search-overlay {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      padding: 0 40px 28px;
-      background: linear-gradient(to top,
-        rgba(244,245,251,1) 0%,
-        rgba(244,245,251,0.7) 55%,
-        transparent 100%);
-    }
-    .hero-search-box {
-      max-width: 580px;
-      display: flex;
+
+    /* ── SEARCH SECTION ─────────────────────── */
+    .search-section {
       background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 24px;
+      box-shadow: 0 2px 8px rgba(61,87,240,.06);
+    }
+    .search-inner { max-width: 1060px; margin: 0 auto; }
+    .hero-search-box {
+      display: flex;
+      background: var(--bg);
       border: 1.5px solid var(--border);
       border-radius: var(--r);
       overflow: hidden;
-      box-shadow: var(--shadow);
       transition: border-color .2s, box-shadow .2s;
     }
     .hero-search-box:focus-within {
@@ -128,7 +121,7 @@
       font-weight: 700;
       cursor: pointer;
       transition: background .15s;
-      letter-spacing: 0.1px;
+      white-space: nowrap;
     }
     .hero-search-btn:hover { background: var(--blue2); }
     .hero-search-btn:active { transform: scale(.98); }
@@ -140,7 +133,7 @@
       margin-top: 10px;
     }
     .hint {
-      background: rgba(255,255,255,0.82);
+      background: var(--card);
       border: 1px solid var(--border);
       border-radius: 100px;
       padding: 5px 14px;
@@ -148,7 +141,6 @@
       color: var(--muted);
       cursor: pointer;
       transition: all .15s;
-      backdrop-filter: blur(4px);
     }
     .hint:hover { border-color: var(--blue); color: var(--blue); background: #fff; }
 
@@ -434,7 +426,11 @@
 <!-- HERO -->
 <section class="hero">
   <img class="hero-img" src="banner.png" alt="Найди ответ" />
-  <div class="hero-search-overlay">
+</section>
+
+<!-- SEARCH -->
+<div class="search-section">
+  <div class="search-inner">
     <div class="hero-search-box">
       <input
         class="hero-search-input"
@@ -452,7 +448,7 @@
       <span class="hint" onclick="fillHint(this)">Интервалы для новичков</span>
     </div>
   </div>
-</section>
+</div>
 
 <!-- MAIN -->
 <div class="main">
