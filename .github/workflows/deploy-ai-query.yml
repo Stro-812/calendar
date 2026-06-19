@@ -46,7 +46,7 @@ jobs:
         run: |
           mkdir -p dist/trainerlist dist/ai-query
           cp -r trainerlist/dist/. dist/trainerlist/
-          cp ai-query-prototype/index.html dist/ai-query/index.html
+          cp -r ai-query-prototype/. dist/ai-query/
           cp pages-index.html dist/index.html
 
       - name: Configure Pages
