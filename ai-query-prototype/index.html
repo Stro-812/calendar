@@ -490,13 +490,6 @@
       </div>
     </div>
 
-    <!-- Empty -->
-    <div class="empty" id="emptyState">
-      <div class="empty-icon">🔍</div>
-      <h3>Введите вопрос выше</h3>
-      <p>AI просмотрит всю базу знаний<br/>и найдёт подходящий ответ с источником</p>
-    </div>
-
     <!-- Recent -->
     <div class="recent-list" id="recentList">
       <div class="section-label">Недавние запросы</div>
@@ -617,7 +610,6 @@
   function doSearch() {
     const q = document.getElementById('searchInput').value.trim();
     if (!q) return;
-    document.getElementById('emptyState').style.display = 'none';
     document.getElementById('answerCard').classList.remove('on');
     document.getElementById('fbThanks').style.display = 'none';
     document.querySelectorAll('.fb-btn').forEach(b => b.disabled = false);
