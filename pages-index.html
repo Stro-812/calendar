@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Прототипы — Stro</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f1117;
+      color: #e8eaf0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .wrap { max-width: 480px; width: 100%; }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 40px;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #f97316; }
+    h1 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: #7880a0; margin-bottom: 16px; }
+    .pages { display: flex; flex-direction: column; gap: 10px; }
+    .page-link {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: #1a1d27;
+      border: 1px solid #2e3350;
+      border-radius: 12px;
+      padding: 18px 20px;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color .15s, background .15s;
+    }
+    .page-link:hover { border-color: #f97316; background: #22263a; }
+    .page-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .page-icon.orange { background: rgba(249,115,22,0.15); }
+    .page-icon.blue   { background: rgba(96,165,250,0.12); }
+    .page-title { font-size: 15px; font-weight: 600; }
+    .page-desc  { font-size: 13px; color: #7880a0; margin-top: 2px; }
+    .page-arrow { margin-left: auto; color: #7880a0; font-size: 16px; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="logo"><div class="dot"></div> Stro</div>
+    <h1>Прототипы</h1>
+    <div class="pages">
+
+      <a href="trainerlist/" class="page-link">
+        <div class="page-icon orange">👥</div>
+        <div>
+          <div class="page-title">Список тренеров</div>
+          <div class="page-desc">Поиск и фильтрация тренеров платформы</div>
+        </div>
+        <div class="page-arrow">→</div>
+      </a>
+
+      <a href="ai-query/" class="page-link">
+        <div class="page-icon blue">🔍</div>
+        <div>
+          <div class="page-title">AI-поиск по базе знаний</div>
+          <div class="page-desc">Вопросы по материалам Telegram, YouTube, Instagram</div>
+        </div>
+        <div class="page-arrow">→</div>
+      </a>
+
+    </div>
+  </div>
+</body>
+</html>

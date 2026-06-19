@@ -7,6 +7,7 @@ on:
     paths:
       - "trainerlist/**"
       - "ai-query-prototype/**"
+      - "pages-index.html"
       - ".github/workflows/deploy-ai-query.yml"
   workflow_dispatch:
 
@@ -39,10 +40,14 @@ jobs:
         working-directory: trainerlist
         run: npm run build
         env:
-          BASE_PATH: /calendar/
+          BASE_PATH: /calendar/trainerlist/
 
-      - name: Add AI query prototype at /ai-query/
-        run: mkdir -p trainerlist/dist/ai-query && cp ai-query-prototype/index.html trainerlist/dist/ai-query/index.html
+      - name: Assemble dist
+        run: |
+          mkdir -p dist/trainerlist dist/ai-query
+          cp -r trainerlist/dist/. dist/trainerlist/
+          cp ai-query-prototype/index.html dist/ai-query/index.html
+          cp pages-index.html dist/index.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -52,7 +57,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: trainerlist/dist
+          path: dist
 
   deploy:
     needs: build
