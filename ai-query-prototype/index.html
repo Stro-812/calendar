@@ -8,24 +8,26 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:       #0d0d10;
-      --surface:  #17171d;
-      --surface2: #1f1f28;
-      --border:   #2a2a38;
-      --orange:   #f97316;
-      --orange2:  #fb923c;
-      --text:     #ffffff;
-      --muted:    #6b7090;
-      --muted2:   #9099b8;
-      --tg:       #38bdf8;
-      --yt:       #f87171;
-      --ig:       #c084fc;
-      --success:  #34d399;
-      --r:        12px;
-      --r-sm:     8px;
+      --bg:        #f4f5fb;
+      --white:     #ffffff;
+      --card:      #eaecf7;
+      --card2:     #e2e5f5;
+      --blue:      #3d57f0;
+      --blue2:     #5570f5;
+      --green:     #4a7c3f;
+      --green-l:   #7ac143;
+      --red:       #e8504a;
+      --text:      #1a1b2e;
+      --muted:     #6b6f8c;
+      --muted2:    #9599b8;
+      --border:    #d8dcee;
+      --tg:        #1e90d4;
+      --yt:        #e03030;
+      --ig:        #9333ea;
+      --r:         12px;
+      --r-sm:      8px;
+      --shadow:    0 1px 3px rgba(61,87,240,.08), 0 4px 16px rgba(61,87,240,.06);
     }
-
-    html { scroll-behavior: smooth; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
@@ -37,41 +39,41 @@
 
     /* ── TOPBAR ─────────────────────────────── */
     .topbar {
-      position: fixed;
-      top: 0; left: 0; right: 0;
+      position: sticky;
+      top: 0;
       height: 56px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 32px;
-      background: rgba(13,13,16,0.85);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
       z-index: 200;
+      box-shadow: 0 1px 4px rgba(61,87,240,.07);
     }
     .logo {
       display: flex;
       align-items: center;
       gap: 6px;
       font-weight: 800;
-      font-size: 17px;
+      font-size: 18px;
       letter-spacing: -0.5px;
       text-decoration: none;
       color: var(--text);
     }
-    .logo-s { color: var(--orange); }
+    .logo-s { color: var(--blue); }
     .nav { display: flex; gap: 28px; }
     .nav a {
       font-size: 14px;
-      color: var(--muted2);
+      color: var(--muted);
       text-decoration: none;
       transition: color .15s;
     }
-    .nav a:hover, .nav a.active { color: var(--text); }
+    .nav a:hover { color: var(--text); }
+    .nav a.active { color: var(--blue); font-weight: 600; }
 
     /* ── HERO BANNER ────────────────────────── */
     .hero {
-      margin-top: 56px;
       position: relative;
       width: 100%;
       overflow: hidden;
@@ -80,83 +82,84 @@
     .hero-img {
       width: 100%;
       display: block;
-      max-height: 420px;
+      max-height: 400px;
       object-fit: cover;
       object-position: center top;
     }
-    /* Search overlay anchored to bottom of banner */
     .hero-search-overlay {
       position: absolute;
       bottom: 0; left: 0; right: 0;
-      padding: 0 40px 32px;
-      background: linear-gradient(to top, rgba(13,13,16,1) 0%, rgba(13,13,16,0.6) 60%, transparent 100%);
+      padding: 0 40px 28px;
+      background: linear-gradient(to top,
+        rgba(244,245,251,1) 0%,
+        rgba(244,245,251,0.7) 55%,
+        transparent 100%);
     }
     .hero-search-box {
-      max-width: 600px;
+      max-width: 580px;
       display: flex;
-      background: rgba(23,23,29,0.95);
+      background: var(--white);
       border: 1.5px solid var(--border);
       border-radius: var(--r);
       overflow: hidden;
-      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
       transition: border-color .2s, box-shadow .2s;
     }
     .hero-search-box:focus-within {
-      border-color: var(--orange);
-      box-shadow: 0 0 0 3px rgba(249,115,22,0.18);
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(61,87,240,.14);
     }
     .hero-search-input {
       flex: 1;
       background: transparent;
       border: none;
       outline: none;
-      padding: 15px 20px;
+      padding: 14px 18px;
       font-size: 15px;
       color: var(--text);
     }
-    .hero-search-input::placeholder { color: var(--muted); }
+    .hero-search-input::placeholder { color: var(--muted2); }
     .hero-search-btn {
       padding: 0 24px;
-      background: var(--orange);
+      background: var(--blue);
       border: none;
       color: #fff;
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
-      white-space: nowrap;
       transition: background .15s;
-      letter-spacing: 0.2px;
+      letter-spacing: 0.1px;
     }
-    .hero-search-btn:hover { background: var(--orange2); }
+    .hero-search-btn:hover { background: var(--blue2); }
+    .hero-search-btn:active { transform: scale(.98); }
 
-    /* Hint chips */
     .hints {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
-      margin-top: 12px;
+      margin-top: 10px;
     }
     .hint {
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.82);
+      border: 1px solid var(--border);
       border-radius: 100px;
       padding: 5px 14px;
       font-size: 12px;
-      color: var(--muted2);
+      color: var(--muted);
       cursor: pointer;
       transition: all .15s;
-      white-space: nowrap;
+      backdrop-filter: blur(4px);
     }
-    .hint:hover { border-color: var(--orange); color: var(--orange); }
+    .hint:hover { border-color: var(--blue); color: var(--blue); background: #fff; }
 
-    /* ── MAIN LAYOUT ────────────────────────── */
+    /* ── MAIN ───────────────────────────────── */
     .main {
-      max-width: 1080px;
+      max-width: 1060px;
       margin: 0 auto;
-      padding: 36px 24px 80px;
+      padding: 32px 24px 80px;
       display: grid;
-      grid-template-columns: 1fr 300px;
-      gap: 28px;
+      grid-template-columns: 1fr 292px;
+      gap: 24px;
     }
 
     /* ── ANSWER AREA ────────────────────────── */
@@ -164,38 +167,42 @@
 
     /* Skeleton */
     .skeleton-card {
-      background: var(--surface);
+      background: var(--white);
       border: 1px solid var(--border);
       border-radius: var(--r);
-      padding: 28px;
+      padding: 24px;
       display: none;
+      box-shadow: var(--shadow);
     }
     .skeleton-card.on { display: block; }
     .sk {
-      background: linear-gradient(90deg, var(--surface2) 25%, var(--border) 50%, var(--surface2) 75%);
+      background: linear-gradient(90deg, var(--card) 25%, var(--card2) 50%, var(--card) 75%);
       background-size: 200% 100%;
       animation: shimmer 1.3s infinite;
       border-radius: 4px;
-      height: 13px;
+      height: 12px;
       margin-bottom: 10px;
     }
-    .sk.w90 { width: 90%; } .sk.w75 { width: 75%; } .sk.w55 { width: 55%; }
-    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .sk.w90{width:90%} .sk.w75{width:75%} .sk.w55{width:55%}
+    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
     /* Answer card */
     .answer-card {
-      background: var(--surface);
+      background: var(--white);
       border: 1px solid var(--border);
       border-radius: var(--r);
       overflow: hidden;
       display: none;
+      box-shadow: var(--shadow);
     }
     .answer-card.on { display: block; }
+
     .ac-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 14px 22px;
+      padding: 13px 20px;
+      background: var(--card);
       border-bottom: 1px solid var(--border);
     }
     .ac-label {
@@ -206,26 +213,28 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.6px;
-      color: var(--muted2);
+      color: var(--muted);
     }
     .pulse-dot {
       width: 6px; height: 6px;
       border-radius: 50%;
-      background: var(--success);
+      background: var(--green-l);
       animation: blink 1.6s infinite;
     }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
-    .ac-time { font-size: 11px; color: var(--muted); }
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+    .ac-time { font-size: 11px; color: var(--muted2); }
 
-    .ac-body { padding: 22px; }
-    .ac-query { font-size: 13px; color: var(--muted2); margin-bottom: 14px; }
+    .ac-body { padding: 20px; }
+    .ac-query { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
     .ac-query strong { color: var(--text); }
     .ac-quote {
-      font-size: 16px;
+      font-size: 15px;
       line-height: 1.7;
-      border-left: 3px solid var(--orange);
-      padding-left: 16px;
-      margin-bottom: 22px;
+      border-left: 3px solid var(--green-l);
+      padding: 10px 16px;
+      background: var(--card);
+      border-radius: 0 var(--r-sm) var(--r-sm) 0;
+      margin-bottom: 20px;
       color: var(--text);
     }
     .sources-title {
@@ -233,7 +242,7 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      color: var(--muted);
+      color: var(--muted2);
       margin-bottom: 10px;
     }
     .sources { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -250,50 +259,52 @@
       transition: opacity .15s, transform .1s;
     }
     .src:hover { opacity: .8; transform: translateY(-1px); }
-    .src.tg  { background: rgba(56,189,248,.1);  border-color: rgba(56,189,248,.25);  color: var(--tg); }
-    .src.yt  { background: rgba(248,113,113,.1);  border-color: rgba(248,113,113,.25);  color: var(--yt); }
-    .src.ig  { background: rgba(192,132,252,.1);  border-color: rgba(192,132,252,.25);  color: var(--ig); }
+    .src.tg { background: rgba(30,144,212,.1);  border-color: rgba(30,144,212,.25); color: var(--tg); }
+    .src.yt { background: rgba(224,48,48,.08);  border-color: rgba(224,48,48,.2);  color: var(--yt); }
+    .src.ig { background: rgba(147,51,234,.08); border-color: rgba(147,51,234,.2); color: var(--ig); }
 
     .ac-foot {
-      padding: 12px 22px;
+      padding: 12px 20px;
       border-top: 1px solid var(--border);
+      background: var(--card);
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
     .fb-label { font-size: 13px; color: var(--muted); }
     .fb-btn {
-      background: none;
+      background: var(--white);
       border: 1px solid var(--border);
       border-radius: 6px;
       padding: 4px 10px;
-      color: var(--muted2);
+      color: var(--muted);
       font-size: 13px;
       cursor: pointer;
       transition: all .15s;
     }
-    .fb-btn:hover { border-color: var(--text); color: var(--text); }
-    .fb-thanks { font-size: 13px; color: var(--success); display: none; margin-left: 4px; }
+    .fb-btn:hover { border-color: var(--blue); color: var(--blue); }
+    .fb-thanks { font-size: 13px; color: var(--green); display: none; margin-left: 4px; font-weight: 600; }
 
     /* Empty state */
     .empty {
-      background: var(--surface);
+      background: var(--white);
       border: 1px solid var(--border);
       border-radius: var(--r);
       padding: 48px 32px;
       text-align: center;
+      box-shadow: var(--shadow);
     }
     .empty-icon { font-size: 36px; margin-bottom: 14px; }
-    .empty h3 { font-size: 16px; margin-bottom: 6px; }
-    .empty p { font-size: 14px; color: var(--muted2); line-height: 1.6; }
+    .empty h3 { font-size: 16px; margin-bottom: 6px; color: var(--text); }
+    .empty p { font-size: 14px; color: var(--muted); line-height: 1.6; }
 
-    /* Recent */
+    /* Section label */
     .section-label {
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.6px;
-      color: var(--muted);
+      color: var(--muted2);
       margin-bottom: 12px;
       display: flex;
       align-items: center;
@@ -301,63 +312,69 @@
     }
     .section-label::after { content:''; flex:1; height:1px; background: var(--border); }
 
+    /* Recent */
     .recent-list { display: flex; flex-direction: column; gap: 6px; margin-top: 24px; }
     .recent-item {
       display: flex;
       align-items: flex-start;
       gap: 10px;
-      background: var(--surface);
+      background: var(--white);
       border: 1px solid var(--border);
       border-radius: var(--r-sm);
-      padding: 12px 14px;
+      padding: 11px 14px;
       cursor: pointer;
       text-align: left;
       width: 100%;
       transition: border-color .15s, background .15s;
+      box-shadow: 0 1px 2px rgba(61,87,240,.04);
     }
-    .recent-item:hover { border-color: rgba(249,115,22,.4); background: var(--surface2); }
+    .recent-item:hover { border-color: var(--blue); background: rgba(61,87,240,.03); }
     .rn {
       flex-shrink: 0;
       width: 20px; height: 20px;
       border-radius: 50%;
-      background: var(--surface2);
+      background: var(--card);
       display: flex; align-items: center; justify-content: center;
       font-size: 10px; font-weight: 700; color: var(--muted);
       margin-top: 1px;
     }
-    .r-text { font-size: 13px; color: var(--text); flex: 1; line-height: 1.4; }
-    .r-time { font-size: 11px; color: var(--muted); margin-top: 2px; }
-    .r-arrow { color: var(--muted); font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+    .r-text { font-size: 13px; color: var(--text); flex:1; line-height: 1.4; }
+    .r-time { font-size: 11px; color: var(--muted2); margin-top: 2px; }
+    .r-arrow { color: var(--muted2); font-size: 14px; flex-shrink: 0; margin-top: 1px; }
 
     /* ── SIDEBAR ────────────────────────────── */
-    .sidebar { display: flex; flex-direction: column; gap: 22px; }
+    .sidebar { display: flex; flex-direction: column; gap: 20px; }
 
+    /* Stats */
     .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .stat {
-      background: var(--surface);
+      background: var(--white);
       border: 1px solid var(--border);
       border-radius: var(--r-sm);
       padding: 14px 12px;
       text-align: center;
+      box-shadow: var(--shadow);
     }
     .stat-val {
       font-size: 22px;
       font-weight: 800;
-      color: var(--orange);
+      color: var(--blue);
       letter-spacing: -0.5px;
       line-height: 1;
     }
-    .stat-lbl { font-size: 11px; color: var(--muted2); margin-top: 4px; }
+    .stat-lbl { font-size: 11px; color: var(--muted); margin-top: 4px; }
 
+    /* Pinned */
     .pinned-list { display: flex; flex-direction: column; gap: 8px; }
     .pin {
-      background: var(--surface);
+      background: var(--white);
       border: 1px solid var(--border);
       border-radius: var(--r-sm);
       overflow: hidden;
+      box-shadow: var(--shadow);
       transition: border-color .15s;
     }
-    .pin:hover { border-color: rgba(249,115,22,.35); }
+    .pin:hover { border-color: var(--blue); }
     .pin-body { padding: 12px 14px; }
     .pin-meta { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
     .badge {
@@ -368,22 +385,22 @@
       padding: 2px 7px;
       border-radius: 4px;
     }
-    .badge.new     { background: rgba(249,115,22,.15); color: var(--orange); }
-    .badge.video   { background: rgba(248,113,113,.12); color: var(--yt); }
-    .badge.release { background: rgba(52,211,153,.12); color: var(--success); }
-    .badge.tgb     { background: rgba(56,189,248,.12); color: var(--tg); }
-    .pin-date { font-size: 10px; color: var(--muted); margin-left: auto; }
+    .badge.new     { background: rgba(232,80,74,.1);  color: var(--red); }
+    .badge.video   { background: rgba(224,48,48,.08); color: var(--yt); }
+    .badge.release { background: rgba(74,124,63,.1);  color: var(--green); }
+    .badge.tgb     { background: rgba(30,144,212,.1); color: var(--tg); }
+    .pin-date { font-size: 10px; color: var(--muted2); margin-left: auto; }
     .pin-title { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.4; margin-bottom: 3px; }
-    .pin-desc  { font-size: 12px; color: var(--muted2); line-height: 1.4; }
+    .pin-desc  { font-size: 12px; color: var(--muted); line-height: 1.4; }
     .pin-foot {
       padding: 8px 14px;
       border-top: 1px solid var(--border);
-      background: rgba(0,0,0,.2);
+      background: var(--card);
     }
     .pin-link {
       font-size: 12px;
       font-weight: 600;
-      color: var(--orange);
+      color: var(--blue);
       text-decoration: none;
       transition: opacity .15s;
     }
@@ -391,13 +408,13 @@
 
     /* ── RESPONSIVE ─────────────────────────── */
     @media (max-width: 720px) {
-      .main { grid-template-columns: 1fr; padding: 24px 16px 60px; }
+      .main { grid-template-columns: 1fr; padding: 20px 16px 60px; }
       .sidebar { order: -1; }
-      .stats-grid { grid-template-columns: repeat(3, 1fr); }
+      .stats-grid { grid-template-columns: repeat(4, 1fr); }
       .topbar { padding: 0 16px; }
       .nav { display: none; }
-      .hero-search-overlay { padding: 0 16px 24px; }
-      .hero-img { max-height: 280px; }
+      .hero-search-overlay { padding: 0 16px 20px; }
+      .hero-img { max-height: 260px; }
     }
   </style>
 </head>
@@ -414,9 +431,9 @@
   </nav>
 </header>
 
-<!-- HERO BANNER -->
+<!-- HERO -->
 <section class="hero">
-  <img class="hero-img" src="banner.png" alt="Найди ответ — база знаний S10" />
+  <img class="hero-img" src="banner.png" alt="Найди ответ" />
   <div class="hero-search-overlay">
     <div class="hero-search-box">
       <input
@@ -440,26 +457,23 @@
 <!-- MAIN -->
 <div class="main">
 
-  <!-- ANSWER COL -->
   <div class="answer-col">
 
     <!-- Skeleton -->
     <div class="skeleton-card" id="skeleton">
       <div class="sk w55" style="height:11px;margin-bottom:20px;"></div>
-      <div class="sk w90"></div>
-      <div class="sk w75"></div>
-      <div class="sk w90"></div>
+      <div class="sk w90"></div><div class="sk w75"></div><div class="sk w90"></div>
       <div class="sk w55" style="margin-top:6px;"></div>
-      <div style="display:flex;gap:8px;margin-top:22px;">
-        <div class="sk" style="width:100px;height:32px;border-radius:8px;"></div>
-        <div class="sk" style="width:100px;height:32px;border-radius:8px;"></div>
+      <div style="display:flex;gap:8px;margin-top:20px;">
+        <div class="sk" style="width:110px;height:32px;border-radius:8px;margin:0"></div>
+        <div class="sk" style="width:110px;height:32px;border-radius:8px;margin:0"></div>
       </div>
     </div>
 
     <!-- Answer -->
     <div class="answer-card" id="answerCard">
       <div class="ac-head">
-        <div class="ac-label"><div class="pulse-dot"></div> Ответ AI</div>
+        <div class="ac-label"><div class="pulse-dot"></div>Ответ AI</div>
         <span class="ac-time" id="acTime"></span>
       </div>
       <div class="ac-body">
@@ -486,55 +500,38 @@
     <!-- Recent -->
     <div class="recent-list" id="recentList">
       <div class="section-label">Недавние запросы</div>
-
       <button class="recent-item" onclick="fillQuery('Как восстановиться после марафона за 2 дня?')">
-        <div class="rn">1</div>
-        <div style="flex:1"><div class="r-text">Как восстановиться после марафона за 2 дня?</div><div class="r-time">3 мин. назад</div></div>
-        <div class="r-arrow">›</div>
+        <div class="rn">1</div><div style="flex:1"><div class="r-text">Как восстановиться после марафона за 2 дня?</div><div class="r-time">3 мин. назад</div></div><div class="r-arrow">›</div>
       </button>
-
       <button class="recent-item" onclick="fillQuery('Оптимальный темп для жировой зоны')">
-        <div class="rn">2</div>
-        <div style="flex:1"><div class="r-text">Оптимальный темп для жировой зоны</div><div class="r-time">18 мин. назад</div></div>
-        <div class="r-arrow">›</div>
+        <div class="rn">2</div><div style="flex:1"><div class="r-text">Оптимальный темп для жировой зоны</div><div class="r-time">18 мин. назад</div></div><div class="r-arrow">›</div>
       </button>
-
       <button class="recent-item" onclick="fillQuery('Сколько км в неделю бегать новичку?')">
-        <div class="rn">3</div>
-        <div style="flex:1"><div class="r-text">Сколько км в неделю бегать новичку?</div><div class="r-time">42 мин. назад</div></div>
-        <div class="r-arrow">›</div>
+        <div class="rn">3</div><div style="flex:1"><div class="r-text">Сколько км в неделю бегать новичку?</div><div class="r-time">42 мин. назад</div></div><div class="r-arrow">›</div>
       </button>
-
       <button class="recent-item" onclick="fillQuery('Что есть перед длинной пробежкой?')">
-        <div class="rn">4</div>
-        <div style="flex:1"><div class="r-text">Что есть перед длинной пробежкой?</div><div class="r-time">1 ч. назад</div></div>
-        <div class="r-arrow">›</div>
+        <div class="rn">4</div><div style="flex:1"><div class="r-text">Что есть перед длинной пробежкой?</div><div class="r-time">1 ч. назад</div></div><div class="r-arrow">›</div>
       </button>
-
       <button class="recent-item" onclick="fillQuery('Упражнения для укрепления стопы')">
-        <div class="rn">5</div>
-        <div style="flex:1"><div class="r-text">Упражнения для укрепления стопы</div><div class="r-time">2 ч. назад</div></div>
-        <div class="r-arrow">›</div>
+        <div class="rn">5</div><div style="flex:1"><div class="r-text">Упражнения для укрепления стопы</div><div class="r-time">2 ч. назад</div></div><div class="r-arrow">›</div>
       </button>
     </div>
 
-  </div><!-- /answer-col -->
+  </div>
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
 
-    <!-- Stats -->
     <div>
       <div class="section-label">База знаний</div>
       <div class="stats-grid">
         <div class="stat"><div class="stat-val">2400+</div><div class="stat-lbl">постов</div></div>
         <div class="stat"><div class="stat-val">180+</div><div class="stat-lbl">видео</div></div>
-        <div class="stat"><div class="stat-val">5</div><div class="stat-lbl">лет</div></div>
+        <div class="stat"><div class="stat-val">5 лет</div><div class="stat-lbl">материала</div></div>
         <div class="stat"><div class="stat-val">3</div><div class="stat-lbl">платформы</div></div>
       </div>
     </div>
 
-    <!-- Pinned -->
     <div>
       <div class="section-label">Закреплённое</div>
       <div class="pinned-list">
@@ -580,7 +577,7 @@
 
   </aside>
 
-</div><!-- /main -->
+</div>
 
 <script>
   const ANSWERS = {
@@ -588,25 +585,27 @@
       quote: `Восстановление — такая же часть тренировочного процесса, как и сама нагрузка. После интенсивного блока нужно не менее 48–72 часов лёгкой активности или полного отдыха. Сон 8–9 часов в этот период важнее любого дополнительного занятия.`,
       sources: [
         { t:'tg', label:'Telegram: про восстановление', date:'12 мая 2025' },
-        { t:'yt', label:'YouTube: после марафона', date:'3 апр 2025' },
+        { t:'yt', label:'YouTube: после марафона',      date:'3 апр 2025'  },
       ]
     },
     zone: {
       quote: `Жировая зона (Зона 2) — интенсивность, при которой вы можете спокойно разговаривать полными предложениями. Пульс, как правило, 65–75% от максимального. Именно здесь строится аэробная база — фундамент всей беговой формы.`,
       sources: [
-        { t:'tg', label:'Серия постов про Зону 2', date:'1 июня 2025' },
-        { t:'ig', label:'Reels: зоны пульса', date:'20 мая 2025' },
+        { t:'tg', label:'Серия постов про Зону 2', date:'1 июня 2025'  },
+        { t:'ig', label:'Reels: зоны пульса',       date:'20 мая 2025' },
       ]
     },
     food: {
       quote: `За 2–3 часа до длинной тренировки: углеводы + немного белка (каша, рис, тост). За 30–60 минут — лёгкий перекус: банан или тост с джемом. Жиры и клетчатку лучше ограничить перед стартом.`,
       sources: [
-        { t:'yt', label:'YouTube: питание бегуна', date:'25 мар 2025' },
-        { t:'tg', label:'Пост: предстартовое питание', date:'8 апр 2025' },
-        { t:'ig', label:'Instagram: рецепты', date:'15 фев 2025' },
+        { t:'yt', label:'YouTube: питание бегуна',       date:'25 мар 2025' },
+        { t:'tg', label:'Пост: предстартовое питание',   date:'8 апр 2025'  },
+        { t:'ig', label:'Instagram: рецепты',            date:'15 фев 2025' },
       ]
     }
   };
+
+  const srcIcon = { tg:'✈', yt:'▶', ig:'◈' };
 
   function pickAnswer(q) {
     q = q.toLowerCase();
@@ -615,12 +614,9 @@
     return ANSWERS.default;
   }
 
-  const srcIcon = { tg:'✈', yt:'▶', ig:'◈' };
-
   function doSearch() {
     const q = document.getElementById('searchInput').value.trim();
     if (!q) return;
-
     document.getElementById('emptyState').style.display = 'none';
     document.getElementById('answerCard').classList.remove('on');
     document.getElementById('fbThanks').style.display = 'none';
@@ -632,17 +628,16 @@
       const data = pickAnswer(q);
       document.getElementById('acQuery').innerHTML = `Вопрос: <strong>"${q}"</strong>`;
       document.getElementById('acQuote').textContent = data.quote;
-      document.getElementById('acTime').textContent = new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
-
+      document.getElementById('acTime').textContent =
+        new Date().toLocaleTimeString('ru-RU', { hour:'2-digit', minute:'2-digit' });
       const el = document.getElementById('acSources');
       el.innerHTML = '';
       data.sources.forEach(s => {
         const a = document.createElement('a');
         a.href = '#'; a.className = `src ${s.t}`;
-        a.innerHTML = `${srcIcon[s.t]} ${s.label} <span style="color:var(--muted);font-size:11px;margin-left:4px;">${s.date}</span>`;
+        a.innerHTML = `${srcIcon[s.t]} ${s.label} <span style="color:var(--muted2);font-size:11px;margin-left:4px;">${s.date}</span>`;
         el.appendChild(a);
       });
-
       document.getElementById('answerCard').classList.add('on');
       addRecent(q);
     }, 1100);
@@ -661,8 +656,8 @@
       btn.innerHTML = `<div class="rn">${i+1}</div><div style="flex:1"><div class="r-text">${r.text}</div><div class="r-time">${r.time}</div></div><div class="r-arrow">›</div>`;
       list.insertBefore(btn, list.children[1]);
     });
-    list.querySelectorAll('.recent-item').forEach((el,i) => {
-      const n = el.querySelector('.rn'); if(n) n.textContent = i+1;
+    list.querySelectorAll('.recent-item').forEach((el, i) => {
+      const n = el.querySelector('.rn'); if (n) n.textContent = i + 1;
     });
   }
 
