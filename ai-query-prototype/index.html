@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>База знаний — AI-поиск</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f1117;
+      --surface:   #1a1d27;
+      --surface2:  #22263a;
+      --border:    #2e3350;
+      --accent:    #f97316;
+      --accent2:   #fb923c;
+      --text:      #e8eaf0;
+      --muted:     #7880a0;
+      --link:      #60a5fa;
+      --success:   #34d399;
+      --tg:        #29b6f6;
+      --yt:        #ef4444;
+      --ig:        #c084fc;
+      --radius:    14px;
+      --radius-sm: 8px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ── TOPBAR ─────────────────────────────────────── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      height: 60px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(15,17,23,0.92);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+    .logo {
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+    .nav { display: flex; gap: 24px; }
+    .nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color .15s;
+    }
+    .nav a:hover { color: var(--text); }
+    .nav a.active { color: var(--accent); }
+
+    /* ── LAYOUT ─────────────────────────────────────── */
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      grid-template-rows: auto auto auto;
+      gap: 28px;
+    }
+
+    /* ── HERO SEARCH ────────────────────────────────── */
+    .hero {
+      grid-column: 1 / 3;
+      text-align: center;
+      padding: 48px 0 8px;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(249,115,22,0.12);
+      border: 1px solid rgba(249,115,22,0.3);
+      border-radius: 100px;
+      padding: 4px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      margin-bottom: 12px;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero-sub {
+      color: var(--muted);
+      font-size: 16px;
+      max-width: 540px;
+      margin: 0 auto 36px;
+    }
+
+    .search-box {
+      max-width: 680px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .search-input-wrap {
+      display: flex;
+      gap: 0;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .search-input-wrap:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(249,115,22,0.15);
+    }
+    .search-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      padding: 16px 20px;
+      font-size: 16px;
+      color: var(--text);
+    }
+    .search-input::placeholder { color: var(--muted); }
+    .search-btn {
+      padding: 0 28px;
+      background: var(--accent);
+      border: none;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+      white-space: nowrap;
+    }
+    .search-btn:hover { background: var(--accent2); }
+    .search-btn:active { transform: scale(0.98); }
+    .search-hints {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+    .hint-chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 5px 14px;
+      font-size: 13px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .hint-chip:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── ANSWER AREA ─────────────────────────────────── */
+    .answer-section {
+      grid-column: 1 / 2;
+    }
+
+    /* Loading state */
+    .loading-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      display: none;
+    }
+    .loading-card.visible { display: block; }
+    .skeleton {
+      background: linear-gradient(90deg, var(--surface2) 25%, var(--border) 50%, var(--surface2) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 4px;
+      height: 14px;
+      margin-bottom: 10px;
+    }
+    .skeleton.w80 { width: 80%; }
+    .skeleton.w60 { width: 60%; }
+    .skeleton.w90 { width: 90%; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* Answer card */
+    .answer-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: none;
+    }
+    .answer-card.visible { display: block; }
+    .answer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .answer-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .ai-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--success);
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.3); }
+    }
+    .answer-body { padding: 24px; }
+    .answer-query {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+    .answer-query strong { color: var(--text); }
+    .answer-quote {
+      font-size: 17px;
+      line-height: 1.65;
+      color: var(--text);
+      border-left: 3px solid var(--accent);
+      padding-left: 18px;
+      margin-bottom: 24px;
+    }
+    .sources-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .sources {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .source-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: opacity .15s, transform .1s;
+      border: 1px solid transparent;
+    }
+    .source-link:hover { opacity: 0.85; transform: translateY(-1px); }
+    .source-link:active { transform: translateY(0); }
+    .source-link.tg {
+      background: rgba(41,182,246,0.12);
+      border-color: rgba(41,182,246,0.3);
+      color: var(--tg);
+    }
+    .source-link.yt {
+      background: rgba(239,68,68,0.12);
+      border-color: rgba(239,68,68,0.3);
+      color: var(--yt);
+    }
+    .source-link.ig {
+      background: rgba(192,132,252,0.12);
+      border-color: rgba(192,132,252,0.3);
+      color: var(--ig);
+    }
+    .source-icon { font-size: 14px; }
+
+    /* Feedback row */
+    .answer-footer {
+      padding: 14px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .feedback {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .fb-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 4px 10px;
+      color: var(--muted);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .fb-btn:hover { border-color: var(--text); color: var(--text); }
+    .answer-time { font-size: 12px; color: var(--muted); }
+
+    /* Empty state */
+    .empty-state {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 48px 32px;
+      text-align: center;
+    }
+    .empty-icon { font-size: 40px; margin-bottom: 16px; }
+    .empty-state h3 { font-size: 17px; margin-bottom: 8px; }
+    .empty-state p { color: var(--muted); font-size: 14px; }
+
+    /* ── RECENT QUERIES (left column below answer) ──── */
+    .recent-section {
+      grid-column: 1 / 2;
+    }
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--muted);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .recent-list { display: flex; flex-direction: column; gap: 8px; }
+    .recent-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: all .15s;
+      text-align: left;
+    }
+    .recent-item:hover {
+      border-color: rgba(249,115,22,0.4);
+      background: var(--surface2);
+    }
+    .recent-num {
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+    .recent-text { font-size: 14px; color: var(--text); flex: 1; }
+    .recent-time { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .recent-arrow { color: var(--muted); font-size: 14px; flex-shrink: 0; margin-top: 2px; }
+
+    /* ── SIDEBAR ────────────────────────────────────── */
+    .sidebar {
+      grid-column: 2 / 3;
+      grid-row: 2 / 4;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .pinned-list { display: flex; flex-direction: column; gap: 10px; }
+    .pinned-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      transition: border-color .15s;
+    }
+    .pinned-card:hover { border-color: rgba(249,115,22,0.35); }
+    .pinned-inner { padding: 14px 16px; }
+    .pinned-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .pinned-badge {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .pinned-badge.new {
+      background: rgba(249,115,22,0.15);
+      color: var(--accent);
+    }
+    .pinned-badge.video {
+      background: rgba(239,68,68,0.12);
+      color: var(--yt);
+    }
+    .pinned-badge.release {
+      background: rgba(52,211,153,0.12);
+      color: var(--success);
+    }
+    .pinned-badge.tg {
+      background: rgba(41,182,246,0.12);
+      color: var(--tg);
+    }
+    .pinned-date { font-size: 11px; color: var(--muted); margin-left: auto; }
+    .pinned-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+      line-height: 1.4;
+    }
+    .pinned-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .pinned-footer {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .pinned-link {
+      font-size: 12px;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      transition: opacity .15s;
+    }
+    .pinned-link:hover { opacity: 0.75; }
+
+    /* Stats row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 12px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+    }
+    .stat-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* ── RESPONSIVE ──────────────────────────────────── */
+    @media (max-width: 768px) {
+      .page {
+        grid-template-columns: 1fr;
+        padding: 24px 16px 60px;
+      }
+      .hero { grid-column: 1; padding: 32px 0 8px; }
+      .answer-section { grid-column: 1; }
+      .recent-section { grid-column: 1; }
+      .sidebar { grid-column: 1; grid-row: auto; }
+      .topbar { padding: 0 16px; }
+      .nav { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="logo">
+    <div class="logo-dot"></div>
+    База знаний
+  </div>
+  <nav class="nav">
+    <a href="#" class="active">AI-поиск</a>
+    <a href="#">Материалы</a>
+    <a href="#">Тренировки</a>
+    <a href="#">Программы</a>
+  </nav>
+</header>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- HERO SEARCH -->
+  <section class="hero">
+    <div class="hero-badge">
+      <span>✦</span> AI-поиск по базе знаний
+    </div>
+    <h1>Задайте вопрос —<br/>получите <span>точный ответ</span></h1>
+    <p class="hero-sub">
+      Поиск по тысячам постов из Telegram, YouTube и Instagram.
+      AI находит нужное и даёт ссылку на источник.
+    </p>
+
+    <div class="search-box">
+      <div class="search-input-wrap">
+        <input
+          class="search-input"
+          id="searchInput"
+          type="text"
+          placeholder="Например: как повысить темп на длинной дистанции?"
+          autocomplete="off"
+        />
+        <button class="search-btn" id="searchBtn" onclick="handleSearch()">
+          Найти ответ
+        </button>
+      </div>
+      <div class="search-hints">
+        <span class="hint-chip" onclick="fillHint(this)">Как восстанавливаться после марафона?</span>
+        <span class="hint-chip" onclick="fillHint(this)">Темп для пульсовой зоны 2</span>
+        <span class="hint-chip" onclick="fillHint(this)">Питание на длинной тренировке</span>
+        <span class="hint-chip" onclick="fillHint(this)">Интервальные тренировки для начинающих</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ANSWER SECTION -->
+  <div class="answer-section">
+
+    <!-- Loading skeleton -->
+    <div class="loading-card" id="loadingCard">
+      <div class="skeleton w60" style="height:12px; margin-bottom:20px;"></div>
+      <div class="skeleton w90"></div>
+      <div class="skeleton w80"></div>
+      <div class="skeleton w90"></div>
+      <div class="skeleton w60" style="margin-top:8px;"></div>
+      <div style="display:flex; gap:8px; margin-top:24px;">
+        <div class="skeleton" style="width:110px; height:34px; border-radius:8px;"></div>
+        <div class="skeleton" style="width:110px; height:34px; border-radius:8px;"></div>
+      </div>
+    </div>
+
+    <!-- Answer card -->
+    <div class="answer-card" id="answerCard">
+      <div class="answer-header">
+        <div class="answer-label">
+          <div class="ai-dot"></div>
+          Ответ AI
+        </div>
+        <span class="answer-time" id="answerTime"></span>
+      </div>
+      <div class="answer-body">
+        <div class="answer-query" id="answerQuery"></div>
+        <div class="answer-quote" id="answerQuote"></div>
+        <div class="sources-label">Источники</div>
+        <div class="sources" id="answerSources"></div>
+      </div>
+      <div class="answer-footer">
+        <div class="feedback">
+          Полезно?
+          <button class="fb-btn" onclick="feedback('👍')">👍 Да</button>
+          <button class="fb-btn" onclick="feedback('👎')">👎 Нет</button>
+        </div>
+        <span id="feedbackMsg" style="font-size:13px; color:var(--success); display:none;">Спасибо!</span>
+      </div>
+    </div>
+
+    <!-- Empty state (initial) -->
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">🔍</div>
+      <h3>Введите вопрос выше</h3>
+      <p>AI просмотрит всю базу знаний и найдёт<br/>подходящий ответ с ссылкой на источник</p>
+    </div>
+
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <!-- Stats -->
+    <div>
+      <div class="section-title">База знаний</div>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-value">2 400+</div>
+          <div class="stat-label">постов</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">180+</div>
+          <div class="stat-label">видео</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">5 лет</div>
+          <div class="stat-label">материала</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pinned / News -->
+    <div>
+      <div class="section-title">Закреплённое</div>
+      <div class="pinned-list">
+
+        <div class="pinned-card">
+          <div class="pinned-inner">
+            <div class="pinned-meta">
+              <span class="pinned-badge new">Новое</span>
+              <span class="pinned-date">17 июня</span>
+            </div>
+            <div class="pinned-title">Новая программа: 10 недель к полумарафону</div>
+            <div class="pinned-desc">Структурированный план тренировок для уровня 1:45–2:15</div>
+          </div>
+          <div class="pinned-footer">
+            <a href="#" class="pinned-link">Открыть программу →</a>
+          </div>
+        </div>
+
+        <div class="pinned-card">
+          <div class="pinned-inner">
+            <div class="pinned-meta">
+              <span class="pinned-badge video">YouTube</span>
+              <span class="pinned-date">14 июня</span>
+            </div>
+            <div class="pinned-title">Как правильно бегать в жару: разбор техники</div>
+            <div class="pinned-desc">Новое видео — темп, пульс, гидратация в летних условиях</div>
+          </div>
+          <div class="pinned-footer">
+            <a href="#" class="pinned-link">Смотреть на YouTube →</a>
+          </div>
+        </div>
+
+        <div class="pinned-card">
+          <div class="pinned-inner">
+            <div class="pinned-meta">
+              <span class="pinned-badge release">Обновление</span>
+              <span class="pinned-date">10 июня</span>
+            </div>
+            <div class="pinned-title">AI-поиск теперь понимает вопросы о питании</div>
+            <div class="pinned-desc">Добавлены материалы по спортивному питанию и восстановлению</div>
+          </div>
+          <div class="pinned-footer">
+            <a href="#" class="pinned-link">Подробнее →</a>
+          </div>
+        </div>
+
+        <div class="pinned-card">
+          <div class="pinned-inner">
+            <div class="pinned-meta">
+              <span class="pinned-badge tg">Telegram</span>
+              <span class="pinned-date">8 июня</span>
+            </div>
+            <div class="pinned-title">Разбор частых ошибок при беге в гору</div>
+            <div class="pinned-desc">Серия постов с видео и анализом техники на подъёмах</div>
+          </div>
+          <div class="pinned-footer">
+            <a href="#" class="pinned-link">Читать в Telegram →</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </aside>
+
+  <!-- RECENT QUERIES -->
+  <section class="recent-section">
+    <div class="section-title">Недавние запросы</div>
+    <div class="recent-list" id="recentList">
+
+      <button class="recent-item" onclick="fillQuery('Как восстановиться после марафона за 2 дня?')">
+        <div class="recent-num">1</div>
+        <div style="flex:1">
+          <div class="recent-text">Как восстановиться после марафона за 2 дня?</div>
+          <div class="recent-time">3 минуты назад</div>
+        </div>
+        <div class="recent-arrow">→</div>
+      </button>
+
+      <button class="recent-item" onclick="fillQuery('Оптимальный темп для жировой зоны')">
+        <div class="recent-num">2</div>
+        <div style="flex:1">
+          <div class="recent-text">Оптимальный темп для жировой зоны</div>
+          <div class="recent-time">18 минут назад</div>
+        </div>
+        <div class="recent-arrow">→</div>
+      </button>
+
+      <button class="recent-item" onclick="fillQuery('Сколько км в неделю бегать новичку?')">
+        <div class="recent-num">3</div>
+        <div style="flex:1">
+          <div class="recent-text">Сколько км в неделю бегать новичку?</div>
+          <div class="recent-time">42 минуты назад</div>
+        </div>
+        <div class="recent-arrow">→</div>
+      </button>
+
+      <button class="recent-item" onclick="fillQuery('Что есть перед длинной пробежкой?')">
+        <div class="recent-num">4</div>
+        <div style="flex:1">
+          <div class="recent-text">Что есть перед длинной пробежкой?</div>
+          <div class="recent-time">1 час назад</div>
+        </div>
+        <div class="recent-arrow">→</div>
+      </button>
+
+      <button class="recent-item" onclick="fillQuery('Упражнения для укрепления стопы')">
+        <div class="recent-num">5</div>
+        <div style="flex:1">
+          <div class="recent-text">Упражнения для укрепления стопы</div>
+          <div class="recent-time">2 часа назад</div>
+        </div>
+        <div class="recent-arrow">→</div>
+      </button>
+
+    </div>
+  </section>
+
+</div>
+
+<script>
+  // ── Mock data ──────────────────────────────────────────────────────────────
+  const mockAnswers = {
+    default: {
+      quote: `Восстановление — такая же часть тренировочного процесса, как и сама нагрузка. После интенсивного блока нужно не менее 48–72 часов лёгкой активности или полного отдыха, прежде чем снова наращивать объём. Сон 8–9 часов в этот период важнее любого дополнительного занятия.`,
+      sources: [
+        { type: 'tg', label: 'Пост в Telegram', url: '#', date: '12 мая 2025' },
+        { type: 'yt', label: 'YouTube: Восстановление', url: '#', date: '3 апр 2025' },
+      ]
+    },
+    tempo: {
+      quote: `Жировая зона (Зона 2) — это интенсивность, при которой вы можете спокойно разговаривать полными предложениями. Пульс, как правило, 65–75% от максимального. Для большинства любителей это темп, который кажется «слишком медленным». Именно в нём строится аэробная база.`,
+      sources: [
+        { type: 'tg', label: 'Серия постов про Зону 2', url: '#', date: '1 июня 2025' },
+        { type: 'ig', label: 'Reels: Зоны пульса', url: '#', date: '20 мая 2025' },
+      ]
+    },
+    nutrition: {
+      quote: `За 2–3 часа до длинной тренировки оптимально: углеводы (каша, рис, хлеб) + немного белка. За 30–60 минут — лёгкий перекус: банан, тост с джемом. Жиры и клетчатку лучше ограничить перед стартом, чтобы избежать проблем с желудком.`,
+      sources: [
+        { type: 'yt', label: 'YouTube: Питание бегуна', url: '#', date: '25 мар 2025' },
+        { type: 'tg', label: 'Пост: предстартовое питание', url: '#', date: '8 апр 2025' },
+        { type: 'ig', label: 'Instagram: рецепты', url: '#', date: '15 фев 2025' },
+      ]
+    }
+  };
+
+  function getAnswer(query) {
+    const q = query.toLowerCase();
+    if (q.includes('темп') || q.includes('пульс') || q.includes('зона')) return mockAnswers.tempo;
+    if (q.includes('ест') || q.includes('питани') || q.includes('еда') || q.includes('перекус')) return mockAnswers.nutrition;
+    return mockAnswers.default;
+  }
+
+  // ── UI helpers ─────────────────────────────────────────────────────────────
+  function now() {
+    return new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function sourceIcon(type) {
+    return { tg: '✈', yt: '▶', ig: '◈' }[type] || '◉';
+  }
+
+  function show(id) { document.getElementById(id).classList.add('visible'); }
+  function hide(id) { document.getElementById(id).classList.remove('visible'); }
+  function hideEl(id) { document.getElementById(id).style.display = 'none'; }
+  function showEl(id) { document.getElementById(id).style.display = ''; }
+
+  // ── Search ─────────────────────────────────────────────────────────────────
+  function handleSearch() {
+    const query = document.getElementById('searchInput').value.trim();
+    if (!query) return;
+
+    // Reset
+    hideEl('emptyState');
+    hide('answerCard');
+    document.getElementById('feedbackMsg').style.display = 'none';
+    show('loadingCard');
+
+    // Simulate network delay
+    setTimeout(() => {
+      hide('loadingCard');
+      renderAnswer(query);
+      addToRecent(query);
+    }, 1200);
+  }
+
+  function renderAnswer(query) {
+    const data = getAnswer(query);
+
+    document.getElementById('answerQuery').innerHTML =
+      `Вопрос: <strong>"${query}"</strong>`;
+    document.getElementById('answerQuote').textContent = data.quote;
+    document.getElementById('answerTime').textContent = now();
+
+    const sourcesEl = document.getElementById('answerSources');
+    sourcesEl.innerHTML = '';
+    data.sources.forEach(s => {
+      const a = document.createElement('a');
+      a.href = s.url;
+      a.className = `source-link ${s.type}`;
+      a.innerHTML = `<span class="source-icon">${sourceIcon(s.type)}</span> ${s.label} <span style="color:var(--muted);font-size:11px;">${s.date}</span>`;
+      sourcesEl.appendChild(a);
+    });
+
+    show('answerCard');
+  }
+
+  // ── Recent list ────────────────────────────────────────────────────────────
+  let recentQueries = [];
+
+  function addToRecent(query) {
+    recentQueries.unshift({ text: query, time: 'только что' });
+    recentQueries = recentQueries.slice(0, 5);
+    renderRecent();
+  }
+
+  function renderRecent() {
+    const list = document.getElementById('recentList');
+    const dynamic = list.querySelectorAll('.dynamic-recent');
+    dynamic.forEach(el => el.remove());
+
+    recentQueries.forEach((q, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'recent-item dynamic-recent';
+      btn.onclick = () => fillQuery(q.text);
+      btn.innerHTML = `
+        <div class="recent-num">${i + 1}</div>
+        <div style="flex:1">
+          <div class="recent-text">${q.text}</div>
+          <div class="recent-time">${q.time}</div>
+        </div>
+        <div class="recent-arrow">→</div>
+      `;
+      list.insertBefore(btn, list.firstChild);
+    });
+
+    // Re-number static items
+    const all = list.querySelectorAll('.recent-item');
+    all.forEach((el, i) => {
+      const num = el.querySelector('.recent-num');
+      if (num) num.textContent = i + 1;
+    });
+  }
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  function fillHint(el) {
+    document.getElementById('searchInput').value = el.textContent.trim();
+    document.getElementById('searchInput').focus();
+  }
+
+  function fillQuery(text) {
+    document.getElementById('searchInput').value = text;
+    handleSearch();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function feedback(val) {
+    document.getElementById('feedbackMsg').style.display = 'inline';
+    document.querySelectorAll('.fb-btn').forEach(b => b.disabled = true);
+  }
+
+  // Enter key
+  document.getElementById('searchInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') handleSearch();
+  });
+</script>
+</body>
+</html>
