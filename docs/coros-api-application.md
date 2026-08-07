@@ -56,8 +56,9 @@ to keep request volume to the minimum necessary.
 
 ## Technical contact
 
-- **Name:** [технический контакт]
+- **Name:** Yuri Strofilov (World Champion in marathon, age group)
 - **Email:** mail@stro.run
+- **Residency:** Portugal (EU) — the integration operates under EU / GDPR data-protection rules.
 
 ## Data retention & security
 
