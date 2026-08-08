@@ -11,12 +11,10 @@
 
 **Product description:**
 S10.run is an online running-training platform and coach marketplace with
-approximately **50,000 athletes** and **~180 professional running coaches**
-(marathon, track & field, trail, ultra). The platform provides AI-generated
-training plans, athlete–coach communication (via a Telegram bot), long-term
-planning, and detailed performance analytics. It also runs weekly online
-"Running Challenges," for which it automatically generates official finish
-protocols. An iOS app is available on the App Store.
+approximately 50,000 athletes and ~180 professional running coaches (marathon,
+track & field, trail, ultra). The platform provides AI-generated training plans,
+athlete–coach communication, long-term planning, and detailed performance
+analytics.
 
 **Current integration status:**
 We currently import athlete workout tracks via the **Strava API**. We want to
